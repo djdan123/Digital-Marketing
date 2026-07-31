@@ -1,39 +1,53 @@
 ﻿<?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\Auth\PasswordController;
-use App\Http\Controllers\Api\Auth\ProfileController;
-use App\Http\Controllers\Api\AuthController as LoginController;
+use App\Http\Controllers\Api\Auth\RegisteredUserController;
+use App\Http\Controllers\Api\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Api\Auth\NewPasswordController;
+use App\Http\Controllers\Api\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\Payment\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [LoginController::class, 'login']);
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
 
-// Public webhook endpoint for payment gateways (no auth)
-Route::post('/payments/webhook', [\App\Http\Controllers\Api\Payment\WebhookController::class, 'handle']);
+// Routes publiques
+Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
+Route::post('/reset-password', [NewPasswordController::class, 'store']);
+Route::post('/payments/webhook', [WebhookController::class, 'handle']);
 
+// Routes protégées par authentification
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
-
+    // Utilisateur courant
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
-    require __DIR__.'/admin.php';
-});
-// et pour les routes communes
-Route::prefix('')->middleware('auth:sanctum')->group(function () {
-    require __DIR__.'/campaigns.php';
-});
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
 
-    require __DIR__.'/campaigns.php';
-    require __DIR__.'/payments.php';
-    require __DIR__.'/reports.php';
-    require __DIR__.'/statistics.php';
-    require __DIR__.'/media.php';
-    require __DIR__.'/admin.php';
-    require __DIR__.'/advertiser.php';
-    require __DIR__.'/shared.php';
-    require __DIR__.'/channels.php';
+    // Groupe Admin (préfixe /admin)
+    Route::prefix('admin')->group(function () {
+        require __DIR__ . '/admin.php';
+    });
+
+    // Groupe Annonceur (préfixe /advertiser)
+    Route::prefix('advertiser')->group(function () {
+        require __DIR__ . '/advertiser.php';
+    });
+
+    // Groupe Responsable Média (préfixe /media-manager)
+    Route::prefix('media-manager')->group(function () {
+        require __DIR__ . '/channels.php';
+    });
+
+    // Routes partagées (lecture) (préfixe /shared)
+    Route::prefix('shared')->group(function () {
+        require __DIR__ . '/shared.php';
+    });
 });

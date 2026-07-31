@@ -6,9 +6,16 @@ use App\Http\Controllers\Api\Media\DashboardController;
 use App\Http\Controllers\Api\Media\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('media-manager')->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index']);
-    Route::apiResource('advertisements', AdvertisementController::class)->only(['index', 'show']);
-    Route::apiResource('broadcasts', BroadcastController::class)->only(['index', 'show']);
-    Route::apiResource('schedules', ScheduleController::class)->only(['index', 'show']);
-});
+Route::get('dashboard', [DashboardController::class, 'index'])->name('media-manager.dashboard');
+
+Route::apiResource('advertisements', AdvertisementController::class)
+    ->names('media-manager.advertisements')
+    ->only(['index', 'show']);
+
+Route::apiResource('broadcasts', BroadcastController::class)
+    ->names('media-manager.broadcasts')
+    ->only(['index', 'show']);
+
+Route::apiResource('schedules', ScheduleController::class)
+    ->names('media-manager.schedules')
+    ->only(['index', 'show']);

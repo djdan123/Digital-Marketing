@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash; 
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
             RolesPermissionsSeeder::class,
             CountriesSeeder::class,
             CategoriesSeeder::class,
+            CompaniesSeeder::class,  
             MediaSeeder::class,
             AdminSeeder::class,
             AdvertisersSeeder::class,
@@ -31,7 +33,11 @@ class DatabaseSeeder extends Seeder
         // Exemple d'utilisateur de test (idempotent)
         User::firstOrCreate(
             ['email' => 'test@example.com'],
-            ['name' => 'Test User']
+            [
+                'name' => 'Test User',
+                  'password' => Hash::make('password'),
+
+            ]
         );
     }
 }

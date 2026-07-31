@@ -5,16 +5,19 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Media;
 use App\Models\Category;
+use App\Models\Company;
 
 class MediaSeeder extends Seeder
 {
     public function run(): void
     {
         $category = Category::firstOrCreate(['name' => 'Radio'], ['slug' => 'radio']);
+        $company = Company::first(); // Récupère la première entreprise
 
         Media::firstOrCreate([
             'name' => 'Radio FM Example',
-            'category_id' => $category->id
+            'category_id' => $category->id,
+            'company_id' => $company->id,
         ], [
             'type' => 'radio',
             'pricing_type' => 'per_spot',
