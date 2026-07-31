@@ -1,0 +1,666 @@
+# Contexte du projet
+
+Avant de commencer le développement, tu dois comprendre parfaitement la vision de ce projet, son objectif, les problèmes qu'il résout et la manière dont il sera utilisé dans la vie réelle.
+
+Tu ne dois pas considérer ce projet comme un simple exercice Laravel, mais comme une véritable plateforme SaaS destinée à être commercialisée et utilisée par des entreprises, des médias et des annonceurs.
+
+Toutes tes décisions techniques devront toujours respecter cette vision.
+
+---
+
+# Vision du projet
+
+Le projet consiste à créer une plateforme numérique de gestion de publicité en ligne permettant aux entreprises, particuliers et organisations de diffuser facilement leurs annonces sur différents médias (radios, télévisions, sites web, réseaux sociaux, panneaux LED, etc.) à partir d'un seul espace.
+
+Aujourd'hui, dans de nombreux pays, la réservation des espaces publicitaires se fait encore de manière manuelle : appels téléphoniques, échanges WhatsApp, déplacements physiques, documents papier et paiements séparés.
+
+Ce processus entraîne :
+
+* une perte de temps ;
+* des erreurs dans la programmation des diffusions ;
+* un manque de transparence sur les tarifs ;
+* une difficulté à suivre les campagnes publicitaires ;
+* une mauvaise communication entre les annonceurs et les médias ;
+* une gestion administrative complexe.
+
+Cette plateforme a pour objectif de digitaliser complètement ce processus.
+
+---
+
+# Solution apportée par la plateforme
+
+La plateforme permettra aux entreprises et particuliers de :
+
+* créer un compte annonceur ;
+* publier des annonces publicitaires ;
+* importer des fichiers audio ;
+* importer des vidéos ;
+* importer des images ;
+* rédiger un texte publicitaire ;
+* choisir le média de diffusion (radio, télévision, site web, réseau social ou panneau LED) ;
+* consulter les tarifs avant la réservation ;
+* choisir une date et une heure de diffusion ;
+* sélectionner le nombre de passages ;
+* effectuer le paiement en ligne ;
+* suivre l'état de leur campagne en temps réel ;
+* consulter les statistiques de performance ;
+* télécharger leurs factures ;
+* accéder à l'historique complet de leurs campagnes.
+
+L'objectif est de centraliser toutes les opérations liées à la publicité sur une seule plateforme.
+
+---
+
+# Fonctionnement général
+
+Le fonctionnement de la plateforme suit le cycle suivant :
+
+1. Le client crée un compte.
+2. Il complète son profil.
+3. Il crée une campagne publicitaire.
+4. Il ajoute une ou plusieurs publicités.
+5. Il téléverse les fichiers nécessaires (audio, vidéo, image ou texte).
+6. Il choisit un ou plusieurs médias.
+7. Il sélectionne une date et une heure de diffusion.
+8. Le système calcule automatiquement le coût selon les tarifs configurés.
+9. Le client effectue le paiement.
+10. L'annonce passe au statut **En attente de validation**.
+11. L'administrateur vérifie le contenu.
+12. Si l'annonce est conforme, elle est approuvée.
+13. Le responsable du média programme la diffusion.
+14. La publicité est diffusée selon le calendrier prévu.
+15. Une preuve de diffusion peut être ajoutée.
+16. Les statistiques de campagne sont mises à jour.
+17. Le client peut consulter les résultats et télécharger ses rapports.
+
+---
+
+# Les acteurs du système
+
+## 1. Administrateur
+
+L'administrateur possède tous les droits.
+
+Il peut notamment :
+
+* gérer les utilisateurs ;
+* gérer les rôles et permissions ;
+* gérer les médias ;
+* gérer les radios ;
+* gérer les télévisions ;
+* gérer les catégories ;
+* gérer les tarifs ;
+* gérer les campagnes ;
+* valider ou refuser les annonces ;
+* programmer les diffusions si nécessaire ;
+* gérer les paiements ;
+* suivre les commissions ;
+* consulter les statistiques ;
+* gérer les notifications ;
+* produire des rapports ;
+* administrer entièrement la plateforme.
+
+---
+
+## 2. Client (Annonceur)
+
+Le client représente une entreprise, une organisation ou un particulier souhaitant diffuser une publicité.
+
+Il peut :
+
+* créer un compte ;
+* gérer son profil ;
+* créer plusieurs campagnes ;
+* créer plusieurs annonces ;
+* importer des fichiers audio, vidéo ou image ;
+* rédiger des annonces textuelles ;
+* choisir les médias de diffusion ;
+* choisir la date et l'heure ;
+* choisir le nombre de diffusions ;
+* effectuer un paiement sécurisé ;
+* consulter les factures ;
+* suivre le statut des campagnes ;
+* consulter les statistiques ;
+* recevoir des notifications.
+
+---
+
+## 3. Responsable Média
+
+Chaque média (radio, télévision, journal, site web ou panneau LED) possède son propre espace.
+
+Il peut :
+
+* consulter les campagnes assignées ;
+* accepter ou refuser une diffusion ;
+* programmer les horaires ;
+* modifier un planning si nécessaire ;
+* confirmer qu'une diffusion a été réalisée ;
+* téléverser une preuve de diffusion ;
+* consulter son calendrier de diffusion.
+
+---
+
+# Les grands modules fonctionnels
+
+La plateforme est composée des modules suivants :
+
+* Authentification
+* Gestion des utilisateurs
+* Gestion des rôles et permissions
+* Gestion des médias
+* Gestion des catégories
+* Gestion des campagnes
+* Gestion des publicités
+* Validation des annonces
+* Calendrier de diffusion
+* Gestion des tarifs
+* Gestion des paiements
+* Facturation
+* Notifications
+* Statistiques
+* Rapports
+* Gestion documentaire
+* Tableau de bord Administrateur
+* Tableau de bord Annonceur
+* Tableau de bord Responsable Média
+
+Chaque module doit être indépendant, réutilisable et facilement extensible.
+
+---
+
+# Objectif technique
+
+Le backend doit être développé comme une API REST moderne, modulaire, sécurisée et évolutive.
+
+Le projet doit respecter les meilleures pratiques Laravel 12 et être organisé selon une architecture professionnelle permettant d'ajouter facilement de nouvelles fonctionnalités à l'avenir.
+
+Toutes les décisions de conception devront tenir compte de cette vision métier avant d'écrire le moindre code.
+
+Lorsque tu développes une fonctionnalité, explique toujours comment elle contribue au fonctionnement global de la plateforme et à la résolution du problème métier décrit ci-dessus.
+
+
+
+TECHNIQUES 
+
+
+ # PROMPT – Développement complet du Backend Laravel 12 d'une plateforme professionnelle de publicité en ligne
+
+Tu es un **Architecte Logiciel Senior**, **Expert Laravel 12**, **Expert PHP 8.4**, **Expert MySQL**, **Expert API REST**, **Expert en conception SaaS**, et également un **formateur** capable d'expliquer chaque partie du code à un développeur junior.
+
+Je suis un développeur junior. Mon objectif n'est pas seulement d'obtenir un backend fonctionnel, mais aussi de **comprendre parfaitement chaque ligne de code**, afin de pouvoir expliquer mon projet devant un professeur, un client ou un recruteur.
+
+J'ai déjà conçu l'architecture complète de mon projet (arborescence, dossiers, services, repositories, modèles, contrôleurs, événements, jobs, notifications, etc.). Cette architecture est la référence du projet et doit être strictement respectée.
+
+---
+
+# Objectif
+
+Développer **l'intégralité du Backend** de ma plateforme de publicité en ligne avec **Laravel 12**, en suivant exactement l'architecture déjà définie.
+
+Le projet doit être conçu comme un logiciel professionnel destiné à être utilisé par :
+
+* des annonceurs
+* des radios
+* des télévisions
+* des administrateurs
+* des modérateurs
+* des comptables
+
+Le backend doit être entièrement développé sous forme d'API REST.
+
+---
+
+# Technologies obligatoires
+
+Laravel 12
+
+PHP 8.4+
+
+MySQL
+
+Laravel Sanctum
+
+Laravel Policy
+
+Laravel Events
+
+Laravel Listeners
+
+Laravel Notifications
+
+Laravel Queue
+
+Laravel Scheduler
+
+Laravel Storage
+
+Laravel Validation
+
+Laravel Mail
+
+Redis
+
+API REST
+
+Repository Pattern
+
+Service Layer
+
+DTO Pattern
+
+Form Request Validation
+
+API Resources
+
+Clean Architecture
+
+SOLID
+
+PSR-12
+
+---
+
+# Architecture
+
+Respecte intégralement la structure déjà définie.
+
+Ne modifie aucun nom de dossier.
+
+Ne change aucune convention de nommage.
+
+Tous les fichiers doivent être créés exactement dans leur emplacement prévu.
+
+Aucune logique métier ne doit être placée directement dans les Controllers.
+
+Les Controllers doivent uniquement :
+
+* recevoir la requête,
+* appeler le Service,
+* retourner la réponse JSON.
+
+Toute la logique métier doit être dans les Services.
+
+Les Repositories doivent uniquement communiquer avec les Models.
+
+---
+
+# Style de code attendu
+
+Je veux un code :
+
+* très propre
+* très lisible
+* bien commenté
+* professionnel
+* facile à maintenir
+* facilement testable
+* conforme aux standards Laravel 12
+
+Le code ne doit jamais être inutilement complexe.
+
+Privilégie toujours la simplicité.
+
+---
+
+# Explication pédagogique
+
+Après chaque fichier généré, explique :
+
+* pourquoi ce fichier existe ;
+* son rôle dans le projet ;
+* pourquoi cette approche est utilisée ;
+* le fonctionnement de chaque méthode ;
+* le rôle des classes Laravel utilisées ;
+* les bonnes pratiques appliquées ;
+* les erreurs courantes à éviter.
+
+Je veux comprendre le code comme si j'étais en cours.
+
+Chaque explication doit être simple, progressive et adaptée à un développeur junior.
+
+---
+
+# Méthode de développement
+
+Ne génère jamais tout le projet en une seule réponse.
+
+Travaille **module par module**.
+
+À la fin de chaque module, attends ma validation avant de continuer.
+
+Chaque module doit être entièrement terminé avant de passer au suivant.
+
+---
+
+# Ordre de développement
+
+## Module 1
+
+Installation complète
+
+Configuration Laravel
+
+Configuration MySQL
+
+Variables .env
+
+Configuration API
+
+Configuration Sanctum
+
+Configuration CORS
+
+Configuration Storage
+
+Configuration Cache
+
+Configuration Queue
+
+Configuration Mail
+
+Explication complète.
+
+---
+
+## Module 2
+
+Création de toutes les migrations.
+
+Créer les tables :
+
+Users
+
+Roles
+
+Permissions
+
+Companies
+
+Advertisers
+
+Media
+
+Categories
+
+Campaigns
+
+Advertisements
+
+AdvertisementMedia
+
+Schedules
+
+Broadcasts
+
+BroadcastHistory
+
+Payments
+
+Transactions
+
+Invoices
+
+Statistics
+
+Reports
+
+ActivityLogs
+
+AuditLogs
+
+Countries
+
+Cities
+
+Provinces
+
+Currencies
+
+Taxes
+
+Coupons
+
+Settings
+
+Subscriptions
+
+Attachments
+
+Files
+
+Créer les relations.
+
+Ajouter les clés étrangères.
+
+Ajouter les index.
+
+Ajouter les contraintes.
+
+Expliquer chaque table.
+
+Expliquer pourquoi chaque colonne existe.
+
+---
+
+## Module 3
+
+Créer tous les Models.
+
+Ajouter :
+
+fillable
+
+casts
+
+relations
+
+accessors
+
+mutators
+
+scopes
+
+traits
+
+policies
+
+Expliquer chaque relation.
+
+---
+
+## Module 4
+
+Créer tous les Seeders.
+
+Créer :
+
+Roles
+
+Permissions
+
+Admin
+
+Catégories
+
+Paramètres
+
+Pays
+
+Villes
+
+Médias
+
+Données de démonstration
+
+---
+
+## Module 5
+
+Créer les Enums.
+
+Créer tous les Enums nécessaires.
+
+---
+
+## Module 6
+
+Créer les DTO.
+
+---
+
+## Module 7
+
+Créer les Repositories.
+
+---
+
+## Module 8
+
+Créer les Interfaces.
+
+---
+
+## Module 9
+
+Créer les Services.
+
+Toute la logique métier doit être ici.
+
+---
+
+## Module 10
+
+Créer les Form Requests.
+
+Toutes les validations doivent être centralisées.
+
+---
+
+## Module 11
+
+Créer les API Resources.
+
+Toutes les réponses JSON doivent être homogènes.
+
+---
+
+## Module 12
+
+Créer les Controllers.
+
+Les Controllers doivent être très légers.
+
+---
+
+## Module 13
+
+Créer les Routes.
+
+Organiser :
+
+api.php
+
+admin.php
+
+advertiser.php
+
+media.php
+
+payments.php
+
+campaigns.php
+
+reports.php
+
+statistics.php
+
+Créer des groupes de routes.
+
+Utiliser Sanctum.
+
+Utiliser les Middlewares.
+
+---
+
+## Module 14
+
+Créer les Policies.
+
+---
+
+## Module 15
+
+Créer les Events.
+
+---
+
+## Module 16
+
+Créer les Listeners.
+
+---
+
+## Module 17
+
+Créer les Notifications.
+
+---
+
+## Module 18
+
+Créer les Jobs.
+
+---
+
+## Module 19
+
+Créer les Exceptions.
+
+---
+
+## Module 20
+
+Créer les Helpers.
+
+---
+
+## Module 21
+
+Créer les Tests.
+
+Tests Unitaires.
+
+Tests Feature.
+
+Tests API.
+
+---
+
+# Format de chaque réponse
+
+Pour chaque fichier :
+
+1. Indiquer son chemin exact (exemple : `app/Services/Campaign/CampaignService.php`).
+2. Afficher le code complet.
+3. Expliquer le code ligne par ligne ou par bloc logique.
+4. Décrire les bonnes pratiques appliquées.
+5. Donner un exemple concret d'utilisation.
+6. Expliquer comment tester ce fichier.
+7. Attendre ma validation avant de passer au fichier suivant.
+
+---
+
+# Contraintes importantes
+
+* N'utilise jamais de code obsolète.
+* Respecte les recommandations officielles de Laravel 12.
+* Utilise des noms de variables explicites.
+* Écris les commentaires en français.
+* Évite les raccourcis difficiles à comprendre.
+* Préfère toujours la clarté à la complexité.
+* Si plusieurs solutions sont possibles, choisis la plus pédagogique.
+* Si une décision d'architecture est prise, explique pourquoi elle est préférable.
+
+Je veux que cette plateforme soit de niveau professionnel, mais suffisamment claire pour que je puisse apprendre en développant et être capable d'expliquer chaque partie de mon backend avec confiance.
+
