@@ -1,0 +1,20 @@
+<nav class="fixed top-0 z-40 w-full border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+  <div class="px-3 py-3 lg:px-5 lg:pl-64">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <button id="sidebar-toggle" type="button" class="inline-flex items-center p-2 text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
+          <span class="sr-only">Ouvrir le menu</span>
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+        </button>
+        <h1 id="page-title" class="ml-2 text-lg font-semibold text-gray-900 dark:text-white"></h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/admin/profile.html" class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+          <img id="navbar-user-avatar" src="/admin/assets/images/avatar-default.svg" alt="" class="w-8 h-8 rounded-full">
+          <span id="navbar-user-name">Admin</span>
+        </a>
+        <a href="#" id="logout-btn" class="text-sm text-red-600 hover:underline">Déconnexion</a>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modifier - media â€” TruckAll Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
+<link href="/admin/assets/css/app.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 antialiased" data-page="media" data-action="edit">
+<div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
+  <svg class="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+</div>
+<div id="sidebar-container"></div>
+<div id="navbar-container"></div>
+<div class="lg:pl-64 pt-16 p-4 sm:p-6 lg:p-8 page-content">
+  <div class="max-w-7xl mx-auto">
+    <header class="mb-6">
+      <p class="text-sm text-gray-500 dark:text-gray-400">Administration</p>
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Modifier - media</h1>
+    </header>
+    <form id="media-form" class="p-6 bg-white rounded-lg shadow dark:bg-gray-800 max-w-xl space-y-4"><div><label class="block mb-2 text-sm">name</label><input type="text" name="name" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
+<div><label class="block mb-2 text-sm">type</label><input type="text" name="type" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
+<div><label class="block mb-2 text-sm">description</label><input type="text" name="description" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
+<button type="submit" class="mt-4 px-4 py-2 text-white bg-blue-700 rounded-lg hover:bg-blue-800">Enregistrer</button></form>
+    <div id="footer-container"></div>
+  </div>
+</div>
+<script type="module" src="../assets/js/app.js"></script>
+</body>
+</html>

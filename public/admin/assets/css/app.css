@@ -1,0 +1,25 @@
+/* TruckAll Admin — styles personnalisés */
+
+:root {
+  --sidebar-width: 16rem;
+}
+
+#app-loading {
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-link.active {
+  background-color: rgb(243 244 246);
+}
+
+.dark .sidebar-link.active {
+  background-color: rgb(55 65 81);
+}
+
+.table-actions {
+  white-space: nowrap;
+}
+
+.page-content {
+  min-height: calc(100vh - 5rem);
+}

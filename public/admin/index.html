@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - TruckAll</title>
+
+    <!-- Tailwind + Flowbite -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a"}
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Contenu principal -->
+    <div class="p-4 sm:ml-64">
+        
+        <!-- Top Navbar -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Tableau de bord</h1>
+                <p class="text-sm text-gray-400">Bienvenue sur TruckAll</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button id="logout-btn" class="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 rounded-lg">
+                    Déconnexion
+                </button>
+                <div class="flex items-center gap-2">
+                    <img class="w-8 h-8 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff" alt="User">
+                    <span id="user-name" class="text-sm font-medium">Admin</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cartes de statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- Campagnes -->
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">Campagnes</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="stat-campaigns">—</h3>
+                    </div>
+                    <div class="p-3 bg-blue-600/20 rounded-lg">
+                        <svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publicités -->
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">Publicités</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="stat-ads">—</h3>
+                    </div>
+                    <div class="p-3 bg-green-600/20 rounded-lg">
+                        <svg class="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14 16a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2a2 2 0 012-2h4a2 2 0 012 2v2z"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utilisateurs -->
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">Utilisateurs</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="stat-users">—</h3>
+                    </div>
+                    <div class="p-3 bg-purple-600/20 rounded-lg">
+                        <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paiements -->
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">Total Paiements</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="stat-payments">—</h3>
+                    </div>
+                    <div class="p-3 bg-yellow-600/20 rounded-lg">
+                        <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique principal -->
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Performance des campagnes</h3>
+                    <p class="text-sm text-gray-400">Évolution sur les 7 derniers jours</p>
+                </div>
+            </div>
+            <div id="main-chart"></div>
+        </div>
+
+        <!-- Deux colonnes -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Dernières campagnes -->
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h3 class="text-lg font-semibold text-white mb-4">Dernières campagnes</h3>
+                <div id="latest-campaigns" class="space-y-3">
+                    <p class="text-gray-400 text-sm">Chargement...</p>
+                </div>
+            </div>
+
+            <!-- Activité récente -->
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h3 class="text-lg font-semibold text-white mb-4">Activité récente</h3>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-2 rounded-full bg-blue-500"></div>
+                        <div>
+                            <p class="text-sm text-white">Nouvelle campagne créée</p>
+                            <p class="text-xs text-gray-400">Il y a 2 heures</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-2 rounded-full bg-green-500"></div>
+                        <div>
+                            <p class="text-sm text-white">Publicité approuvée</p>
+                            <p class="text-xs text-gray-400">Il y a 5 heures</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-2 rounded-full bg-yellow-500"></div>
+                        <div>
+                            <p class="text-sm text-white">Paiement reçu</p>
+                            <p class="text-xs text-gray-400">Hier</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+    <script type="module">
+        import { requireAuth, getUser, logout } from './assets/js/auth.js';
+        import api from './assets/js/api.js';
+
+        // Protection de la page
+        requireAuth();
+
+        // Afficher le nom de l'utilisateur
+        const user = getUser();
+        if (user) {
+            document.getElementById('user-name').textContent = user.name || 'Admin';
+        }
+
+        // Charger la sidebar
+        fetch('/admin/components/sidebar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('sidebar-container').innerHTML = html;
+            });
+
+        // Bouton déconnexion
+        document.getElementById('logout-btn').addEventListener('click', logout);
+
+        // Charger les statistiques depuis l'API
+        async function loadDashboard() {
+            try {
+                const response = await api.get('/admin/dashboard');
+                const data = response.data.data;
+
+                document.getElementById('stat-campaigns').textContent = data.campaigns_count ?? 0;
+                document.getElementById('stat-ads').textContent = data.advertisements_count ?? 0;
+                document.getElementById('stat-users').textContent = data.users_count ?? 0;
+                document.getElementById('stat-payments').textContent = 
+                    new Intl.NumberFormat('fr-FR').format(data.payments_total ?? 0) + ' $';
+            } catch (error) {
+                console.error('Erreur chargement dashboard:', error);
+            }
+        }
+
+        // Graphique ApexCharts
+        const options = {
+            chart: {
+                type: 'area',
+                height: 320,
+                toolbar: { show: false },
+                background: 'transparent'
+            },
+            theme: { mode: 'dark' },
+            series: [{
+                name: 'Campagnes actives',
+                data: [31, 40, 28, 51, 42, 69, 60]
+            }, {
+                name: 'Publicités diffusées',
+                data: [11, 32, 45, 32, 34, 52, 41]
+            }],
+            xaxis: {
+                categories: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                labels: { style: { colors: '#9ca3af' } }
+            },
+            yaxis: {
+                labels: { style: { colors: '#9ca3af' } }
+            },
+            colors: ['#3b82f6', '#10b981'],
+            stroke: { curve: 'smooth', width: 2 },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.4,
+                    opacityTo: 0.1,
+                }
+            },
+            dataLabels: { enabled: false },
+            grid: { borderColor: '#374151' },
+            legend: { labels: { colors: '#9ca3af' } }
+        };
+
+        const chart = new ApexCharts(document.querySelector("#main-chart"), options);
+        chart.render();
+
+        // Lancer le chargement
+        loadDashboard();
+    </script>
+</body>
+</html>
