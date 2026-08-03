@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
-use App\Http\Controllers\Api\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Api\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\Payment\WebhookController;
 use Illuminate\Http\Request;

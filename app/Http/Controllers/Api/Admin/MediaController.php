@@ -37,8 +37,16 @@ class MediaController extends Controller
 
     public function update(UpdateMediaRequest $request, Media $media): MediaResource
     {
-        $media->update($request->validated());
+        // Récupérer les données validées
+        $data = $request->validated();
 
+        // Mettre à jour
+        $media->update($data);
+
+        // Recharger le modèle pour avoir les valeurs fraîches
+        $media->refresh();
+
+        // Retourner la ressource (pas de JsonResponse)
         return new MediaResource($media);
     }
 

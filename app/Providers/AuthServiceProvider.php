@@ -11,6 +11,7 @@ use App\Models\Media;
 use App\Models\Payment;
 use App\Models\Invoice;
 use App\Models\Advertiser;
+use App\Models\User;
 use App\Policies\CompanyPolicy;
 use App\Policies\CampaignPolicy;
 use App\Policies\AdvertisementPolicy;
@@ -18,6 +19,7 @@ use App\Policies\MediaPolicy;
 use App\Policies\PaymentPolicy;
 use App\Policies\InvoicePolicy;
 use App\Policies\AdvertiserPolicy;
+use App\Policies\UserPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -34,6 +36,7 @@ class AuthServiceProvider extends ServiceProvider
         Payment::class => PaymentPolicy::class,
         Invoice::class => InvoicePolicy::class,
         Advertiser::class => AdvertiserPolicy::class,
+        User::class => UserPolicy::class,
     ];
 
     /**
