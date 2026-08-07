@@ -12,12 +12,23 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+
+         // 🔧 AJOUT : Exclure les routes API de la protection CSRF
+        $middleware->validateCsrfTokens(except: [
+            'api/*',  // Exclure TOUTES les routes API
+            // Ou spécifiquement :
+            // 'api/login',
+            // 'api/register',
+            // 'api/logout',
+        ]);
+        
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
 
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'admin' => \App\Http\Middleware\EnsureAdmin::class,
         ]);
 
         $middleware->web(append: [

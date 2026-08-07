@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Manager - Historique</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: { 500: '#2563eb', 600: '#1d4ed8' } } } } };
+    </script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="sidebar-container"></div>
+
+    <main class="min-h-screen p-4 sm:ml-64">
+        <div class="mb-6">
+            <h1 class="text-2xl font-semibold text-white">Historique</h1>
+            <p class="mt-1 text-sm text-slate-400">Consultation des diffusions passées et des demandes clôturées.</p>
+        </div>
+        <div id="history-list" class="space-y-3"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { initMediaManagerPage, getStatusBadgeClass, getStatusLabel, createEmptyState, formatDate } from '../assets/js/media-manager.js';
+        import api from '../assets/js/api.js';
+
+        await initMediaManagerPage();
+
+        async function loadHistory() {
+            try {
+                const response = await api.get('/mediamanager/broadcasts');
+                const broadcasts = (response.data?.data || response.data || []).filter(item => ['completed', 'rejected', 'failed', 'cancelled'].includes(item.status));
+                renderHistory(broadcasts);
+            } catch (error) {
+                document.getElementById('history-list').innerHTML = createEmptyState('Aucun historique disponible pour le moment.');
+            }
+        }
+
+        function renderHistory(items) {
+            const container = document.getElementById('history-list');
+            if (!items.length) {
+                container.innerHTML = createEmptyState('Aucun élément dans l’historique.');
+                return;
+            }
+            container.innerHTML = items.map(item => `
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+                    <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <p class="text-sm font-semibold text-white">${item.title || 'Diffusion'}</p>
+                            <p class="mt-1 text-sm text-slate-400">${formatDate(item.broadcasted_at || item.start_at)}</p>
+                        </div>
+                        <span class="rounded-full border px-2.5 py-1 text-xs ${getStatusBadgeClass(item.status)}">${getStatusLabel(item.status)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>

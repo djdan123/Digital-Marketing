@@ -13,6 +13,7 @@ use App\Repositories\Contracts\ReportRepositoryInterface;
 use App\Repositories\Contracts\ScheduleRepositoryInterface;
 use App\Repositories\Contracts\SettingRepositoryInterface;
 use App\Repositories\Contracts\StatisticRepositoryInterface;
+use App\Repositories\Contracts\TransactionRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 
 // Repositories Eloquent
@@ -26,6 +27,7 @@ use App\Repositories\Eloquent\ReportRepository;
 use App\Repositories\Eloquent\ScheduleRepository;
 use App\Repositories\Eloquent\SettingRepository;
 use App\Repositories\Eloquent\StatisticRepository;
+use App\Repositories\Eloquent\TransactionRepository;
 use App\Repositories\Eloquent\UserRepository;
 
 // Services Contracts
@@ -94,6 +96,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);
         $this->app->bind(SettingRepositoryInterface::class, SettingRepository::class);
         $this->app->bind(StatisticRepositoryInterface::class, StatisticRepository::class);
+        $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
 
         // === SERVICES ===
         // Existants

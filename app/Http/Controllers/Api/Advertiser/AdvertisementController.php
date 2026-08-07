@@ -26,9 +26,23 @@ class AdvertisementController extends Controller
 			'title' => ['required','string','max:255'],
 			'description' => ['nullable','string'],
 			'format' => ['nullable','string'],
+			'meta' => ['nullable','array'],
+			'meta.file_path' => ['nullable','string'],
+			'meta.file_url' => ['nullable','string'],
+			'meta.filename' => ['nullable','string'],
+			'meta.mime' => ['nullable','string'],
+			'meta.type' => ['nullable','string'],
+			'meta.size' => ['nullable','integer'],
 		]);
 
-		$ad = Advertisement::create($data);
+		$ad = Advertisement::create([
+			'campaign_id' => $data['campaign_id'],
+			'media_id' => $data['media_id'],
+			'title' => $data['title'],
+			'description' => $data['description'] ?? null,
+			'format' => $data['format'] ?? null,
+			'meta' => $data['meta'] ?? null,
+		]);
 
 		return response()->json(['message' => 'Annonce créée', 'data' => $ad], 201);
 	}

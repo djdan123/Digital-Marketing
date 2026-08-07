@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarifs - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Tarifs</h1>
+            <p class="text-sm text-gray-400">Prix par type de contenu et commission plateforme</p>
+        </div>
+
+        <div id="alert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+
+        <!-- Tarifs par type de contenu -->
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-6 mb-6">
+            <h2 class="text-lg font-semibold text-white mb-4">Tarifs par type de contenu (FBU)</h2>
+            <form id="pricing-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-2 text-sm text-gray-300">Image (par diffusion)</label>
+                    <input type="number" id="price_image" min="0" step="1" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5" value="500">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm text-gray-300">Texte (par diffusion)</label>
+                    <input type="number" id="price_text" min="0" step="1" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5" value="2000">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm text-gray-300">Audio (par minute)</label>
+                    <input type="number" id="price_audio" min="0" step="1" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5" value="10000">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm text-gray-300">Vidéo (par minute)</label>
+                    <input type="number" id="price_video" min="0" step="1" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5" value="50000">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm text-gray-300">Commission plateforme (%)</label>
+                    <input type="number" id="commission_rate" min="0" max="100" step="0.1" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5" value="15">
+                </div>
+            </form>
+            <div class="mt-6">
+                <button id="save-btn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg">Enregistrer les tarifs</button>
+            </div>
+        </div>
+
+        <!-- Rappel tarifs médias -->
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+            <h2 class="text-lg font-semibold text-white mb-2">Tarifs par média</h2>
+            <p class="text-sm text-gray-400 mb-4">Les prix de base des médias (radio, TV, LED…) se gèrent dans la fiche de chaque média.</p>
+            <a href="/admin/media/index.html" class="text-blue-400 hover:text-blue-300 text-sm">→ Gérer les médias</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+        fetch('/admin/components/sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        });
+
+        const alertBox = document.getElementById('alert');
+        const saveBtn = document.getElementById('save-btn');
+
+        function showAlert(msg, type = 'error') {
+            alertBox.className = `mb-6 p-4 rounded-lg text-sm ${type === 'success' ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'}`;
+            alertBox.textContent = msg;
+            alertBox.classList.remove('hidden');
+        }
+
+        // Charger depuis settings si disponible
+        async function load() {
+            try {
+                const res = await api.get('/admin/settings', { params: { group: 'pricing', per_page: 50 } });
+                const items = res.data?.data?.data || res.data?.data || [];
+                const map = {};
+                items.forEach(s => { map[s.key] = s.value; });
+
+                if (map.price_image) document.getElementById('price_image').value = map.price_image;
+                if (map.price_text) document.getElementById('price_text').value = map.price_text;
+                if (map.price_audio) document.getElementById('price_audio').value = map.price_audio;
+                if (map.price_video) document.getElementById('price_video').value = map.price_video;
+                if (map.commission_rate) document.getElementById('commission_rate').value = map.commission_rate;
+            } catch (e) {
+                // garder les valeurs par défaut
+            }
+        }
+
+        saveBtn.addEventListener('click', async () => {
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Enregistrement...';
+
+            const settings = [
+                { key: 'price_image', group: 'pricing', value: document.getElementById('price_image').value },
+                { key: 'price_text', group: 'pricing', value: document.getElementById('price_text').value },
+                { key: 'price_audio', group: 'pricing', value: document.getElementById('price_audio').value },
+                { key: 'price_video', group: 'pricing', value: document.getElementById('price_video').value },
+                { key: 'commission_rate', group: 'pricing', value: document.getElementById('commission_rate').value },
+            ];
+
+            try {
+                // Essayer endpoint dédié, sinon settings un par un
+                try {
+                    await api.post('/admin/pricing', {
+                        price_image: settings[0].value,
+                        price_text: settings[1].value,
+                        price_audio: settings[2].value,
+                        price_video: settings[3].value,
+                        commission_rate: settings[4].value,
+                    });
+                } catch {
+                    for (const s of settings) {
+                        await api.post('/admin/settings', s).catch(() =>
+                            api.put('/admin/settings/' + s.key, s)
+                        );
+                    }
+                }
+                showAlert('Tarifs enregistrés', 'success');
+            } catch (error) {
+                showAlert(error.response?.data?.message || 'Erreur lors de l’enregistrement');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Enregistrer les tarifs';
+            }
+        });
+
+        load();
+    </script>
+</body>
+</html>

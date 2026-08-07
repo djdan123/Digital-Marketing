@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruckAll - Publicité multi-médias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div id="header-container"></div>
+
+    <!-- ==================== HERO ==================== -->
+   <!-- ==================== HERO ==================== -->
+    <section class="relative min-h-[85vh] flex items-center overflow-hidden">
+        <!-- Image de fond -->
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1600&q=80" 
+                 alt="TruckAll" 
+                 class="w-full h-full object-cover">
+            <!-- Overlay sombre pour lisibilité -->
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/75 to-slate-950/50"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/40"></div>
+        </div>
+
+        <!-- Contenu texte -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
+            <div class="max-w-2xl">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-white">
+                    Diffusez votre publicité<br>
+                    <span class="text-blue-400">sur tous les médias</span>
+                </h1>
+                <p class="mt-6 text-lg text-slate-300 max-w-lg">
+                    Radios, télévisions, web et panneaux LED. Créez vos campagnes en quelques clics et suivez vos résultats en temps réel.
+                </p>
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="/auth/register.html" 
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition shadow-lg shadow-blue-600/30">
+                        Commencer gratuitement
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                    <a href="/media.html" 
+                       class="inline-flex items-center gap-2 px-6 py-3 border border-white/30 hover:border-white/60 text-white font-semibold rounded-lg transition backdrop-blur-sm bg-white/5">
+                        Voir les médias
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== AVANTAGES ==================== -->
+    <section class="bg-slate-950 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 py-16">
+            <h2 class="text-3xl font-bold text-center text-white mb-12">Pourquoi TruckAll ?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-900/80 border border-slate-700/50 rounded-xl p-6">
+                    <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Rapide</h3>
+                    <p class="text-slate-400 text-sm">Créez et lancez une campagne en moins de 10 minutes.</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-700/50 rounded-xl p-6">
+                    <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Mesurable</h3>
+                    <p class="text-slate-400 text-sm">Suivez en temps réel les performances de vos campagnes.</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-700/50 rounded-xl p-6">
+                    <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Transparent</h3>
+                    <p class="text-slate-400 text-sm">Tarifs clairs selon le type de contenu (image, audio, vidéo).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PRICING ==================== -->
+    <section class="bg-slate-950 border-t border-slate-800 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <h2 class="text-4xl font-bold text-white">Tarifs</h2>
+                <p class="mt-3 text-slate-400">Des prix simples et transparents selon le type de contenu.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Image -->
+                <div class="rounded-2xl bg-slate-900 border border-slate-700/50 p-6 flex flex-col">
+                    <h3 class="text-lg font-semibold text-white">Image</h3>
+                    <div class="mt-4 mb-6">
+                        <span class="text-4xl font-bold text-white">500</span>
+                        <span class="text-blue-400 text-sm ml-1">FBU</span>
+                        <p class="text-sm text-slate-500 mt-1">par diffusion</p>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300 flex-1">
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Format JPG / PNG</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> LED & web</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Diffusion rapide</li>
+                    </ul>
+                    <a href="/auth/register.html" class="mt-6 block text-center py-2.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 font-medium text-sm transition">Commencer →</a>
+                </div>
+
+                <!-- Texte -->
+                <div class="rounded-2xl bg-slate-900 border border-slate-700/50 p-6 flex flex-col">
+                    <h3 class="text-lg font-semibold text-white">Texte</h3>
+                    <div class="mt-4 mb-6">
+                        <span class="text-4xl font-bold text-white">2 000</span>
+                        <span class="text-blue-400 text-sm ml-1">FBU</span>
+                        <p class="text-sm text-slate-500 mt-1">par diffusion</p>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300 flex-1">
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Annonces textuelles</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Radio & web</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Lecture auto</li>
+                    </ul>
+                    <a href="/auth/register.html" class="mt-6 block text-center py-2.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 font-medium text-sm transition">Commencer →</a>
+                </div>
+
+                <!-- Audio -->
+                <div class="rounded-2xl bg-slate-900 border-2 border-blue-500/50 p-6 flex flex-col relative shadow-lg shadow-blue-900/30">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-blue-600 text-white text-xs font-semibold rounded-full">Populaire</div>
+                    <h3 class="text-lg font-semibold text-white">Audio</h3>
+                    <div class="mt-4 mb-6">
+                        <span class="text-4xl font-bold text-white">10 000</span>
+                        <span class="text-blue-400 text-sm ml-1">FBU</span>
+                        <p class="text-sm text-slate-500 mt-1">par minute</p>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300 flex-1">
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Spots radio</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> MP3 / WAV</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Haute qualité</li>
+                    </ul>
+                    <a href="/auth/register.html" class="mt-6 block text-center py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition">Commencer →</a>
+                </div>
+
+                <!-- Vidéo -->
+                <div class="rounded-2xl bg-slate-900 border border-slate-700/50 p-6 flex flex-col">
+                    <h3 class="text-lg font-semibold text-white">Vidéo</h3>
+                    <div class="mt-4 mb-6">
+                        <span class="text-4xl font-bold text-white">50 000</span>
+                        <span class="text-blue-400 text-sm ml-1">FBU</span>
+                        <p class="text-sm text-slate-500 mt-1">par minute</p>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300 flex-1">
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Spots TV & web</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> MP4 / MOV</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Impact maximum</li>
+                    </ul>
+                    <a href="/auth/register.html" class="mt-6 block text-center py-2.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 font-medium text-sm transition">Commencer →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ABOUT ==================== -->
+    <section class="bg-slate-950 border-t border-slate-800">
+        <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[520px]">
+            <div class="relative h-72 lg:h-auto overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80" alt="Médias" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent to-slate-950/50"></div>
+            </div>
+            <div class="flex flex-col justify-center px-8 sm:px-12 lg:px-16 py-14 lg:py-20">
+                <h2 class="text-3xl sm:text-4xl font-bold leading-tight">
+                    Conçu pour les<br>campagnes multi-médias
+                </h2>
+                <p class="mt-6 text-slate-400 text-base leading-relaxed max-w-md">
+                    TruckAll permet aux annonceurs de diffuser leurs publicités sur les radios, télévisions, sites web et panneaux LED. De la création jusqu’à la diffusion, chaque étape est simple, transparente et mesurable.
+                </p>
+                <div class="mt-8">
+                    <a href="/about.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 hover:bg-blue-50 font-medium text-sm rounded-lg transition">
+                        En savoir plus
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script>
+        fetch('/layouts/header.html').then(r => r.text()).then(html => {
+            document.getElementById('header-container').innerHTML = html;
+        });
+        fetch('/layouts/footer.html').then(r => r.text()).then(html => {
+            document.getElementById('footer-container').innerHTML = html;
+        });
+    </script>
+</body>
+</html>

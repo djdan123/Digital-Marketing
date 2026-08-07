@@ -1,31 +1,77 @@
 ﻿<!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Statistiques avancÃ©es â€” TruckAll Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
-<link href="/admin/assets/css/app.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 antialiased" data-page="statistics">
-<div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
-  <svg class="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-</div>
-<div id="sidebar-container"></div>
-<div id="navbar-container"></div>
-<div class="lg:pl-64 pt-16 p-4 sm:p-6 lg:p-8 page-content">
-  <div class="max-w-7xl mx-auto">
-    <header class="mb-6">
-      <p class="text-sm text-gray-500 dark:text-gray-400">Administration</p>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Statistiques avancÃ©es</h1>
-    </header>
-    <div id="statistics-container" class="p-4 bg-white rounded-lg shadow dark:bg-gray-800"><p class="text-gray-500">Chargement...</p></div>
-    <div id="footer-container"></div>
-  </div>
-</div>
-<script type="module" src="../assets/js/app.js"></script>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Statistiques</h1>
+            <p class="text-sm text-gray-400">Vue d’ensemble des performances</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+                <p class="text-sm text-gray-400">Campagnes actives</p>
+                <h3 class="text-2xl font-bold text-white mt-1" id="stat-active">—</h3>
+            </div>
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+                <p class="text-sm text-gray-400">Publicités diffusées</p>
+                <h3 class="text-2xl font-bold text-white mt-1" id="stat-ads">—</h3>
+            </div>
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+                <p class="text-sm text-gray-400">Revenus totaux</p>
+                <h3 class="text-2xl font-bold text-white mt-1" id="stat-revenue">—</h3>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+            <h3 class="text-lg font-semibold text-white mb-4">Évolution</h3>
+            <div id="chart"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+        fetch('/admin/components/sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        });
+
+        async function load() {
+            try {
+                const res = await api.get('/admin/dashboard');
+                const d = res.data.data || {};
+                document.getElementById('stat-active').textContent = d.campaigns_count ?? 0;
+                document.getElementById('stat-ads').textContent = d.advertisements_count ?? 0;
+                document.getElementById('stat-revenue').textContent = 
+                    new Intl.NumberFormat('fr-FR').format(d.payments_total ?? 0) + ' $';
+            } catch (e) {}
+        }
+
+        new ApexCharts(document.querySelector("#chart"), {
+            chart: { type: 'area', height: 300, toolbar: { show: false }, background: 'transparent' },
+            theme: { mode: 'dark' },
+            series: [{ name: 'Performance', data: [30, 40, 35, 50, 49, 60, 70] }],
+            xaxis: { categories: ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], labels: { style: { colors: '#9ca3af' } } },
+            colors: ['#3b82f6'],
+            stroke: { curve: 'smooth' },
+            dataLabels: { enabled: false },
+            grid: { borderColor: '#374151' }
+        }).render();
+
+        load();
+    </script>
 </body>
 </html>

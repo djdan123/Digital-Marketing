@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Manager - Demandes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: { 500: '#2563eb', 600: '#1d4ed8' } } } } };
+    </script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="sidebar-container"></div>
+
+    <main class="min-h-screen p-4 sm:ml-64">
+        <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-white">Demandes</h1>
+                <p class="mt-1 text-sm text-slate-400">Suivi des demandes de diffusion pour votre média.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button data-filter="all" class="filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300">Toutes</button>
+                <button data-filter="pending" class="filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300">En attente</button>
+                <button data-filter="accepted" class="filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300">Acceptées</button>
+                <button data-filter="rejected" class="filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300">Refusées</button>
+                <button data-filter="scheduled" class="filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300">Planifiées</button>
+            </div>
+        </div>
+
+        <div id="requests-list" class="space-y-3"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { initMediaManagerPage, getStatusBadgeClass, getStatusLabel, createEmptyState } from '../assets/js/media-manager.js';
+        import api from '../assets/js/api.js';
+
+        await initMediaManagerPage();
+
+        let requests = [];
+        let activeFilter = 'all';
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeFilter = btn.dataset.filter;
+                renderRequests();
+            });
+        });
+
+        async function loadRequests() {
+            try {
+                const response = await api.get('/media-manager/requests');
+                requests = response.data?.data || response.data || [];
+                renderRequests();
+            } catch (error) {
+                document.getElementById('requests-list').innerHTML = createEmptyState('Endpoint non disponible pour le moment.');
+            }
+        }
+
+        function renderRequests() {
+            const filtered = activeFilter === 'all' ? requests : requests.filter(item => item.status === activeFilter);
+            const container = document.getElementById('requests-list');
+
+            if (!filtered.length) {
+                container.innerHTML = createEmptyState('Aucune demande correspondant à ce filtre.');
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-semibold text-white">${item.campaign?.name || 'Campagne'}</h3>
+                                <span class="rounded-full border px-2.5 py-1 text-xs ${getStatusBadgeClass(item.status)}">${getStatusLabel(item.status)}</span>
+                            </div>
+                            <p class="mt-2 text-sm text-slate-400">Annonceur : ${item.advertiser?.name || '—'} · Média : ${item.media?.name || '—'}</p>
+                            <p class="mt-1 text-xs text-slate-500">Type : ${item.content_type || '—'} · Demande : ${item.requested_at ? new Date(item.requested_at).toLocaleDateString('fr-FR') : '—'}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="/mediamanager/requests-detail.html?id=${item.id}" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:border-blue-500 hover:text-white">Voir détail</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        loadRequests();
+    </script>
+</body>
+</html>

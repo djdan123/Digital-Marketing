@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paiements - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="sidebar-container"></div>
+    <main class="p-4 sm:ml-64 min-h-screen">
+        <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-semibold text-white">Paiements</h1>
+                <p class="mt-1 text-sm text-slate-400">Historique de vos paiements et factures.</p>
+            </div>
+            <a href="/client/payments/invoices.html" class="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-slate-300 hover:border-blue-500 hover:text-white">Voir les factures</a>
+        </div>
+
+        <div id="payments-list" class="space-y-4"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth, logout } from '../../assets/js/auth.js';
+        import api from '../../assets/js/api.js';
+        requireAuth();
+
+        fetch('/layouts/sidebar-client.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+            document.getElementById('logout-btn')?.addEventListener('click', logout);
+        });
+
+        async function loadPayments() {
+            try {
+                const res = await api.get('/advertiser/payments');
+                const items = res.data.data || res.data || [];
+                const container = document.getElementById('payments-list');
+                if (!items.length) {
+                    container.innerHTML = '<div class="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-500">Aucun paiement pour le moment.</div>';
+                    return;
+                }
+
+                container.innerHTML = items.map(payment => `
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg shadow-black/20">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="text-lg font-semibold text-white">${payment.reference || 'Paiement'}</p>
+                                <p class="mt-1 text-sm text-slate-400">${payment.payment_method || '—'} · ${payment.status || 'pending'}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-semibold text-blue-400">${new Intl.NumberFormat('fr-FR').format(payment.amount || 0)} ${payment.currency || 'FBU'}</p>
+                                <p class="text-xs text-slate-500">${payment.created_at ? new Date(payment.created_at).toLocaleDateString('fr-FR') : '—'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('payments-list').innerHTML = '<div class="rounded-xl border border-red-800 bg-red-900/20 p-6 text-red-300">Impossible de charger les paiements.</div>';
+            }
+        }
+
+        loadPayments();
+    </script>
+</body>
+</html>

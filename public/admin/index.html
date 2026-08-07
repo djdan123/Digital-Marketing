@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de bord - TruckAll</title>
 
-    <!-- Tailwind + Flowbite -->
+    <!-- Tailwind + Flowbite (design dark Flowbite) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    
-    <!-- ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="/admin/assets/css/app.css" rel="stylesheet" />
 
     <script>
         tailwind.config = {
@@ -24,6 +22,9 @@
             }
         }
     </script>
+    
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body class="bg-gray-900 text-gray-100">
 
@@ -106,6 +107,49 @@
             </div>
         </div>
 
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Commissions plateforme</h3>
+                    <p class="text-sm text-gray-400">Visualiser les gains selon une période</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="commission-period" class="text-sm text-gray-400">Période</label>
+                    <select id="commission-period" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg px-3 py-2">
+                        <option value="all">Tout</option>
+                        <option value="month">Ce mois</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="day">Aujourd’hui</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gray-900/60 rounded-lg p-4 border border-gray-700">
+                    <p class="text-sm text-gray-400">Total</p>
+                    <h3 class="text-2xl font-bold text-white mt-1" id="stat-commissions-total">—</h3>
+                </div>
+                <div class="bg-gray-900/60 rounded-lg p-4 border border-gray-700">
+                    <p class="text-sm text-gray-400">Cette période</p>
+                    <h3 class="text-2xl font-bold text-white mt-1" id="stat-commissions-period">—</h3>
+                </div>
+                <div class="bg-gray-900/60 rounded-lg p-4 border border-gray-700">
+                    <p class="text-sm text-gray-400">Gain plateforme</p>
+                    <h3 class="text-2xl font-bold text-green-400 mt-1" id="stat-platform-gain">—</h3>
+                </div>
+            </div>
+        </div>
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <p class="text-sm text-gray-400">Aujourd’hui</p>
+                <h3 class="text-2xl font-bold text-white mt-1" id="stat-commissions-today">—</h3>
+                <p class="text-xs text-gray-400 mt-2">Taux actuel : 15 %</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <p class="text-sm text-gray-400">Gain plateforme</p>
+                <h3 class="text-2xl font-bold text-green-400 mt-1" id="stat-platform-gain">—</h3>
+                <p class="text-xs text-gray-400 mt-2">Montant généré depuis le début</p>
+            </div>
+        </div>
+
         <!-- Graphique principal -->
         <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 mb-6">
             <div class="flex justify-between items-center mb-4">
@@ -115,6 +159,17 @@
                 </div>
             </div>
             <div id="main-chart"></div>
+        </div>
+
+        <!-- Commissions: mini-chart -->
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Commissions - 7 derniers jours</h3>
+                    <p class="text-sm text-gray-400">Évolution journalière des commissions prélevées</p>
+                </div>
+            </div>
+            <div id="commissions-chart" style="height:200px"></div>
         </div>
 
         <!-- Deux colonnes -->
@@ -184,19 +239,31 @@
         // Bouton déconnexion
         document.getElementById('logout-btn').addEventListener('click', logout);
 
-        // Charger les statistiques depuis l'API
-        async function loadDashboard() {
+        async function formatCurrency(value) {
+            return new Intl.NumberFormat('fr-FR').format(value ?? 0) + ' FBU';
+        }
+
+        async function loadDashboard(period = 'all') {
             try {
-                const response = await api.get('/admin/dashboard');
+                const response = await api.get('/admin/dashboard', { params: { period } });
                 const data = response.data.data;
 
                 document.getElementById('stat-campaigns').textContent = data.campaigns_count ?? 0;
                 document.getElementById('stat-ads').textContent = data.advertisements_count ?? 0;
                 document.getElementById('stat-users').textContent = data.users_count ?? 0;
-                document.getElementById('stat-payments').textContent = 
-                    new Intl.NumberFormat('fr-FR').format(data.payments_total ?? 0) + ' $';
+                document.getElementById('stat-payments').textContent = await formatCurrency(data.payments_total ?? 0);
+                document.getElementById('stat-commissions-total').textContent = await formatCurrency(data.commissions_total ?? 0);
+                document.getElementById('stat-commissions-period').textContent = await formatCurrency(data.commissions_period ?? 0);
+                document.getElementById('stat-platform-gain').textContent = await formatCurrency(data.commissions_total ?? 0);
             } catch (error) {
                 console.error('Erreur chargement dashboard:', error);
+                document.getElementById('stat-campaigns').textContent = '—';
+                document.getElementById('stat-ads').textContent = '—';
+                document.getElementById('stat-users').textContent = '—';
+                document.getElementById('stat-payments').textContent = '—';
+                document.getElementById('stat-commissions-total').textContent = '—';
+                document.getElementById('stat-commissions-period').textContent = '—';
+                document.getElementById('stat-platform-gain').textContent = '—';
             }
         }
 
@@ -241,8 +308,61 @@
         const chart = new ApexCharts(document.querySelector("#main-chart"), options);
         chart.render();
 
+        document.getElementById('commission-period').addEventListener('change', (event) => {
+            loadDashboard(event.target.value);
+        });
+
         // Lancer le chargement
         loadDashboard();
+
+        // Charger et dessiner le mini-chart des commissions (7 derniers jours)
+        async function loadCommissionsChart() {
+            try {
+                const res = await api.get('/admin/commissions', { params: { period: 'week' } });
+                const items = res.data.data ?? [];
+
+                // Regrouper par date (YYYY-MM-DD) et sommer
+                const grouped = {};
+                for (const it of items) {
+                    const date = it.created_at ? it.created_at.split('T')[0] : (new Date()).toISOString().split('T')[0];
+                    grouped[date] = (grouped[date] || 0) + Number(it.amount || 0);
+                }
+
+                // Construire les 7 jours (ordre chronologique)
+                const labels = [];
+                const data = [];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const key = d.toISOString().split('T')[0];
+                    labels.push(key.split('-').slice(1).join('/'));
+                    data.push(Number(grouped[key] || 0));
+                }
+
+                const options = {
+                    chart: { type: 'area', height: 200, toolbar: { show: false }, background: 'transparent' },
+                    theme: { mode: 'dark' },
+                    series: [{ name: 'Commissions', data }],
+                    xaxis: { categories: labels, labels: { style: { colors: '#9ca3af' } } },
+                    yaxis: { labels: { style: { colors: '#9ca3af' } } },
+                    colors: ['#f59e0b'],
+                    stroke: { curve: 'smooth', width: 2 },
+                    fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.05 } },
+                    dataLabels: { enabled: false },
+                    grid: { borderColor: '#374151' },
+                };
+
+                const el = document.querySelector('#commissions-chart');
+                el.innerHTML = '';
+                const commissionsChart = new ApexCharts(el, options);
+                commissionsChart.render();
+            } catch (e) {
+                console.error('Erreur chargement commissions chart', e);
+                document.getElementById('commissions-chart').textContent = 'Erreur chargement graphique.';
+            }
+        }
+
+        loadCommissionsChart();
     </script>
 </body>
 </html>

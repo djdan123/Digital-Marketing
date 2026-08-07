@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Manager - Tableau de bord</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 400: '#60a5fa', 500: '#2563eb', 600: '#1d4ed8' },
+                        signal: { audio: '#22d3ee', video: '#a78bfa' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                        display: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', ui-sans-serif, system-ui; }
+        .font-display { font-family: 'Space Grotesk', ui-sans-serif, system-ui; }
+
+        .eq-bar { width: 3px; border-radius: 2px; background: linear-gradient(180deg, #67e8f9, #0891b2); transform-origin: bottom; }
+        .eq-bar.idle { animation: none; height: 6px; opacity: .45; }
+        .eq-bar.live { animation: eq 1.1s ease-in-out infinite; }
+        .eq-bar:nth-child(1){ animation-delay: -1.1s; }
+        .eq-bar:nth-child(2){ animation-delay: -0.9s; }
+        .eq-bar:nth-child(3){ animation-delay: -0.7s; }
+        .eq-bar:nth-child(4){ animation-delay: -0.5s; }
+        .eq-bar:nth-child(5){ animation-delay: -0.3s; }
+        .eq-bar:nth-child(6){ animation-delay: -0.15s; }
+        .eq-bar:nth-child(7){ animation-delay: -0.6s; }
+        .eq-bar:nth-child(8){ animation-delay: -0.2s; }
+        @keyframes eq {
+            0%, 100% { height: 6px; }
+            50% { height: 26px; }
+        }
+
+        .filmstrip { position: relative; }
+        .filmstrip::before, .filmstrip::after {
+            content: '';
+            position: absolute; left: 0; right: 0; height: 10px;
+            background-image: radial-gradient(circle, rgba(2,6,23,0.9) 2.5px, transparent 2.6px);
+            background-size: 14px 10px;
+            background-repeat: repeat-x;
+            background-position: 3px center;
+        }
+        .filmstrip::before { top: 0; }
+        .filmstrip::after { bottom: 0; }
+
+        .live-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(248,113,113,0.55); }
+            50% { opacity: .7; box-shadow: 0 0 0 5px rgba(248,113,113,0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .eq-bar, .live-dot { animation: none !important; }
+        }
+
+        .card-hover { transition: border-color .15s ease, transform .15s ease; }
+        .card-hover:hover { border-color: #334155; transform: translateY(-2px); }
+
+        ::-webkit-scrollbar { height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="sidebar-container"></div>
+
+    <main class="min-h-screen p-4 sm:p-6 sm:ml-64">
+
+        <div class="mb-8 flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Media Manager</p>
+                <h1 class="font-display mt-1 text-[26px] font-bold text-white">Tableau de bord</h1>
+                <p class="mt-1 text-sm text-slate-400">Vue d'ensemble des demandes, diffusions et contenus reçus des annonceurs.</p>
+            </div>
+            <p id="today-label" class="text-sm text-slate-500"></p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 card-hover">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-slate-400">Demandes en attente</p>
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </span>
+                </div>
+                <p id="pending-count" class="font-display mt-3 text-3xl font-bold text-white">—</p>
+            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 card-hover">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-slate-400">Diffusions du jour</p>
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </span>
+                </div>
+                <p id="today-broadcasts" class="font-display mt-3 text-3xl font-bold text-white">—</p>
+            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 card-hover">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-slate-400">Terminées ce mois</p>
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </span>
+                </div>
+                <p id="completed-month" class="font-display mt-3 text-3xl font-bold text-white">—</p>
+            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 card-hover">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-slate-400">Taux d'acceptation</p>
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19a3 3 0 11-6 0 3 3 0 016 0zm12-3a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </span>
+                </div>
+                <p id="acceptance-rate" class="font-display mt-3 text-3xl font-bold text-white">—</p>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="font-display text-lg font-bold text-white">Contenus reçus des annonceurs</h2>
+                    <p class="mt-0.5 text-sm text-slate-400">Aperçus audio et vidéo à valider avant diffusion.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button data-media-filter="all" class="media-filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-300">Tous</button>
+                    <button data-media-filter="video" class="media-filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-300">Vidéo</button>
+                    <button data-media-filter="audio" class="media-filter-btn rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-300">Audio</button>
+                </div>
+            </div>
+            <div id="media-strip" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"></div>
+        </div>
+
+        <div class="mt-8 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="font-display text-lg font-bold text-white">Dernières demandes</h2>
+                    <a href="/mediamanager/requests.html" class="text-sm text-blue-400 hover:underline">Voir toutes</a>
+                </div>
+                <div id="requests-list" class="space-y-3"></div>
+            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                <h2 class="font-display text-lg font-bold text-white">Programme du jour</h2>
+                <div id="schedule-list" class="mt-4 space-y-3"></div>
+            </div>
+        </div>
+
+        <div class="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 class="font-display text-lg font-bold text-white">Diffusions sur 7 jours</h2>
+            <div id="chart" class="mt-6"></div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script type="module">
+        import { initMediaManagerPage, getStatusBadgeClass, getStatusLabel, createEmptyState } from '../assets/js/media-manager.js';
+        import api from '../assets/js/api.js';
+
+        await initMediaManagerPage();
+
+        const todayLabel = document.getElementById('today-label');
+        todayLabel.textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+        const AUDIO_EXT = ['mp3', 'wav', 'aac'];
+        const VIDEO_EXT = ['mp4', 'mov', 'avi'];
+
+        function getFileExt(path) {
+            if (!path || typeof path !== 'string') return null;
+            const clean = path.split('?')[0];
+            const parts = clean.split('.');
+            return parts.length > 1 ? parts.pop().toLowerCase() : null;
+        }
+
+        function getMediaKind(item) {
+            const declared = (item.content_type || item.advertisement?.format || '').toLowerCase();
+            if (declared.includes('video')) return 'video';
+            if (declared.includes('audio')) return 'audio';
+            const ext = getFileExt(item.advertisement?.file_path || item.file_path || item.media_url);
+            if (ext && VIDEO_EXT.includes(ext)) return 'video';
+            if (ext && AUDIO_EXT.includes(ext)) return 'audio';
+            return null;
+        }
+
+        function getFileUrl(item) {
+            return item.advertisement?.file_path || item.file_path || item.media_url || item.preview_url || null;
+        }
+
+        let mediaItems = [];
+        let mediaFilter = 'all';
+
+        document.querySelectorAll('.media-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                mediaFilter = btn.dataset.mediaFilter;
+                document.querySelectorAll('.media-filter-btn').forEach(b => b.classList.remove('border-blue-500', 'text-white', 'bg-blue-500/10'));
+                btn.classList.add('border-blue-500', 'text-white', 'bg-blue-500/10');
+                renderMediaStrip();
+            });
+        });
+        document.querySelector('.media-filter-btn[data-media-filter="all"]')?.classList.add('border-blue-500', 'text-white', 'bg-blue-500/10');
+
+        function renderMediaStrip() {
+            const container = document.getElementById('media-strip');
+            const filtered = mediaFilter === 'all' ? mediaItems : mediaItems.filter(m => m.kind === mediaFilter);
+
+            if (!filtered.length) {
+                container.innerHTML = createEmptyState('Aucun contenu audio ou vidéo reçu pour le moment.');
+                return;
+            }
+
+            container.innerHTML = filtered.map((m, idx) => {
+                const item = m.raw;
+                const campaign = item.campaign?.name || 'Campagne';
+                const advertiser = item.advertiser?.name || 'Annonceur';
+                const isVideo = m.kind === 'video';
+                const cardId = `media-card-${idx}`;
+
+                const preview = isVideo
+                    ? `<div class="filmstrip relative flex h-28 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-violet-950 via-slate-900 to-slate-900 py-3">
+                            <button data-play="${cardId}" data-kind="video" class="play-btn flex h-11 w-11 items-center justify-center rounded-full bg-violet-500/90 text-white shadow-lg transition hover:bg-violet-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 translate-x-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                            <span class="absolute right-3 top-3 rounded-full bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-300">Vidéo</span>
+                       </div>`
+                    : `<div class="relative flex h-28 items-center justify-center gap-1 rounded-lg border border-cyan-900/50 bg-gradient-to-br from-cyan-950/40 via-slate-900 to-slate-900">
+                            ${Array.from({length:8}).map(() => `<span class="eq-bar idle"></span>`).join('')}
+                            <button data-play="${cardId}" data-kind="audio" class="play-btn absolute flex h-11 w-11 items-center justify-center rounded-full bg-cyan-500/90 text-white shadow-lg transition hover:bg-cyan-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 translate-x-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                            <span class="absolute right-3 top-3 rounded-full bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-300">Audio</span>
+                       </div>`;
+
+                return `
+                    <div id="${cardId}" class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 card-hover">
+                        ${preview}
+                        <div id="${cardId}-player" class="hidden mt-3"></div>
+                        <div class="mt-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="text-sm font-semibold text-white">${campaign}</h3>
+                                <span class="shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${getStatusBadgeClass(item.status)}">${getStatusLabel(item.status)}</span>
+                            </div>
+                            <p class="mt-1 text-xs text-slate-400">Envoyé par ${advertiser}</p>
+                        </div>
+                        <a href="/mediamanager/requests-detail.html?id=${item.id}" class="mt-3 block rounded-lg border border-slate-700 px-3 py-2 text-center text-xs font-medium text-slate-300 hover:border-blue-500 hover:text-white">Examiner la demande</a>
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('.play-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cardId = btn.dataset.play;
+                    const kind = btn.dataset.kind;
+                    const idx = filtered.findIndex((m, i) => `media-card-${i}` === cardId);
+                    const item = filtered[idx]?.raw;
+                    const url = getFileUrl(item);
+                    const playerSlot = document.getElementById(`${cardId}-player`);
+                    if (!url) {
+                        playerSlot.innerHTML = `<p class="rounded-lg border border-slate-700 bg-slate-800/60 p-2 text-center text-xs text-slate-500">Fichier indisponible.</p>`;
+                        playerSlot.classList.remove('hidden');
+                        return;
+                    }
+                    const tag = kind === 'video'
+                        ? `<video src="${url}" controls autoplay class="w-full rounded-lg bg-black"></video>`
+                        : `<audio src="${url}" controls autoplay class="w-full"></audio>`;
+                    playerSlot.innerHTML = tag;
+                    playerSlot.classList.remove('hidden');
+
+                    if (kind === 'audio') {
+                        document.querySelectorAll(`#${cardId} .eq-bar`).forEach(bar => {
+                            bar.classList.remove('idle');
+                            bar.classList.add('live');
+                        });
+                    }
+                });
+            });
+        }
+
+        async function loadDashboard() {
+            try {
+                const [dashboardRes, requestsRes, schedulesRes, broadcastsRes] = await Promise.all([
+                    api.get('/mediamanager/dashboard').catch(() => ({ data: { data: {} } })),
+                    api.get('/mediamanager/requests').catch(() => ({ data: { data: [] } })),
+                    api.get('/mediamanager/schedules').catch(() => ({ data: { data: [] } })),
+                    api.get('/mediamanager/broadcasts').catch(() => ({ data: { data: [] } }))
+                ]);
+
+                const dashboard = dashboardRes.data?.data || dashboardRes.data || {};
+                const allRequests = requestsRes.data?.data || requestsRes.data || [];
+                const requests = allRequests.slice(0, 5);
+                const schedules = (schedulesRes.data?.data || schedulesRes.data || []).slice(0, 5);
+                const broadcasts = Array.isArray(broadcastsRes.data?.data || broadcastsRes.data || []) ? (broadcastsRes.data?.data || broadcastsRes.data || []) : [];
+
+                document.getElementById('pending-count').textContent = dashboard.pending_requests ?? requests.filter(r => r.status === 'pending').length;
+                document.getElementById('today-broadcasts').textContent = dashboard.today_broadcasts ?? broadcasts.filter(b => b.status === 'scheduled').length;
+                document.getElementById('completed-month').textContent = dashboard.completed_month ?? broadcasts.filter(b => b.status === 'completed').length;
+                document.getElementById('acceptance-rate').textContent = dashboard.acceptance_rate ? `${dashboard.acceptance_rate}%` : '—';
+
+                mediaItems = allRequests
+                    .map(item => ({ raw: item, kind: getMediaKind(item) }))
+                    .filter(m => m.kind !== null);
+                renderMediaStrip();
+
+                const requestsList = document.getElementById('requests-list');
+                requestsList.innerHTML = requests.length ? requests.map(request => `
+                    <a href="/mediamanager/requests-detail.html?id=${request.id}" class="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/60 p-3 transition hover:border-slate-700">
+                        <div>
+                            <p class="text-sm font-medium text-white">${request.campaign?.name || 'Campagne'}</p>
+                            <p class="text-xs text-slate-400">${request.advertiser?.name || 'Annonceur'} · ${request.content_type || '—'}</p>
+                        </div>
+                        <span class="rounded-full border px-2.5 py-1 text-xs ${getStatusBadgeClass(request.status)}">${getStatusLabel(request.status)}</span>
+                    </a>
+                `).join('') : createEmptyState('Aucune demande récente à afficher.');
+
+                const scheduleList = document.getElementById('schedule-list');
+                scheduleList.innerHTML = schedules.length ? schedules.map(item => `
+                    <div class="rounded-lg border border-slate-800 bg-slate-800/60 p-3">
+                        <div class="flex items-center gap-2">
+                            ${item.status === 'in_progress' ? `<span class="live-dot h-1.5 w-1.5 rounded-full bg-red-400"></span>` : ''}
+                            <p class="text-sm font-medium text-white">${item.title || 'Créneau'}</p>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-400">${item.start_at ? new Date(item.start_at).toLocaleString('fr-FR') : 'À définir'}</p>
+                    </div>
+                `).join('') : createEmptyState('Aucun créneau prévu aujourd\u2019hui.');
+
+                renderChart(broadcasts);
+            } catch (error) {
+                document.getElementById('requests-list').innerHTML = createEmptyState('Endpoint non disponible pour le moment.');
+                document.getElementById('schedule-list').innerHTML = createEmptyState('Chargement impossible.');
+                document.getElementById('media-strip').innerHTML = createEmptyState('Endpoint non disponible pour le moment.');
+            }
+        }
+
+        function renderChart(broadcasts) {
+            const values = Array.from({ length: 7 }, (_, i) => {
+                const date = new Date();
+                date.setDate(date.getDate() - (6 - i));
+                const label = date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+                const count = broadcasts.filter(b => new Date(b.broadcasted_at || b.start_at || b.created_at).toDateString() === date.toDateString()).length;
+                return { x: label, y: count };
+            });
+
+            const chart = new ApexCharts(document.getElementById('chart'), {
+                chart: { type: 'line', height: 280, toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: 'dark' },
+                stroke: { curve: 'smooth', width: 3 },
+                series: [{ name: 'Diffusions', data: values.map(v => v.y) }],
+                xaxis: { categories: values.map(v => v.x) },
+                colors: ['#3b82f6'],
+                grid: { borderColor: '#334155' }
+            });
+            chart.render();
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

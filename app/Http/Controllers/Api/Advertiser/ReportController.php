@@ -25,7 +25,7 @@ class ReportController extends Controller
             'campaign_id' => ['sometimes', 'integer', 'exists:campaigns,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'string', Rule::in(['summary', 'performance', 'custom'])],
+            'type' => ['required', 'string', Rule::in(['campaign', 'media', 'payment', 'performance', 'wallet_request'])],
             'filters' => ['nullable', 'array'],
             'results' => ['nullable', 'array'],
         ]);
@@ -50,7 +50,7 @@ class ReportController extends Controller
             'campaign_id' => ['sometimes', 'integer', 'exists:campaigns,id'],
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['sometimes', 'nullable', 'string'],
-            'type' => ['sometimes', 'required', 'string', Rule::in(['summary', 'performance', 'custom'])],
+            'type' => ['sometimes', 'required', 'string', Rule::in(['campaign', 'media', 'payment', 'performance', 'wallet_request'])],
             'filters' => ['sometimes', 'nullable', 'array'],
             'results' => ['sometimes', 'nullable', 'array'],
         ]);

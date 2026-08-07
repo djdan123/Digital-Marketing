@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="flex min-h-screen items-center justify-center px-4 py-10">
+        <div class="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl shadow-black/30">
+            
+            <div class="mb-6 text-center">
+                <a href="/index.html" class="text-2xl font-semibold text-blue-400">TruckAll</a>
+                <p class="mt-2 text-sm text-slate-400">Créer un compte</p>
+            </div>
+
+            <div id="alert" class="mb-4 hidden rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm text-slate-300"></div>
+
+            <form id="register-form" class="space-y-5">
+
+                <!-- Choix du type de compte -->
+                <div>
+                    <label class="mb-2 block text-sm font-medium text-slate-200">Type de compte <span class="text-red-400">*</span></label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="role" value="advertiser" class="peer sr-only" checked>
+                            <div class="rounded-lg border border-slate-700 peer-checked:border-blue-500 peer-checked:bg-blue-600/20 p-3 text-center transition">
+                                <p class="text-sm font-medium text-white">Client</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Annonceur</p>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="role" value="media_manager" class="peer sr-only">
+                            <div class="rounded-lg border border-slate-700 peer-checked:border-blue-500 peer-checked:bg-blue-600/20 p-3 text-center transition">
+                                <p class="text-sm font-medium text-white">Média</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Media Manager</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="name" class="mb-2 block text-sm font-medium text-slate-200">Nom complet <span class="text-red-400">*</span></label>
+                    <input id="name" type="text" required
+                        class="block w-full rounded-lg border border-slate-700 bg-slate-800 p-2.5 text-sm text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Jean Dupont" />
+                </div>
+
+                <div>
+                    <label for="email" class="mb-2 block text-sm font-medium text-slate-200">Email <span class="text-red-400">*</span></label>
+                    <input id="email" type="email" required
+                        class="block w-full rounded-lg border border-slate-700 bg-slate-800 p-2.5 text-sm text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="vous@email.com" />
+                </div>
+
+                <div>
+                    <label for="phone" class="mb-2 block text-sm font-medium text-slate-200">Téléphone</label>
+                    <input id="phone" type="tel"
+                        class="block w-full rounded-lg border border-slate-700 bg-slate-800 p-2.5 text-sm text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="+257 XX XX XX XX" />
+                </div>
+
+                <!-- Champ visible uniquement pour Media Manager -->
+                <div id="company-field" class="hidden">
+                    <label for="company_name" class="mb-2 block text-sm font-medium text-slate-200">Nom du média / société</label>
+                    <input id="company_name" type="text"
+                        class="block w-full rounded-lg border border-slate-700 bg-slate-800 p-2.5 text-sm text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Ex: Radio Isanganiro" />
+                </div>
+
+                <div>
+                    <label for="password" class="mb-2 block text-sm font-medium text-slate-200">Mot de passe <span class="text-red-400">*</span></label>
+                    <input id="password" type="password" required minlength="8"
+                        class="block w-full rounded-lg border border-slate-700 bg-slate-800 p-2.5 text-sm text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Minimum 8 caractères" />
+                </div>
+
+                <div>
+                    <label for="password_confirmation" class="mb-2 block text-sm font-medium text-slate-200">Confirmer le mot de passe <span class="text-red-400">*</span></label>
+                    <input id="password_confirmation" type="password" required
+                        class="block w-full rounded-lg border border-slate-700 bg-slate-800 p-2.5 text-sm text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500" />
+                </div>
+
+                <button id="submit-btn" type="submit"
+                    class="w-full rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/30">
+                    Créer mon compte
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-sm text-slate-400">
+                Déjà un compte ?
+                <a href="/auth/login.html" class="font-medium text-blue-400 hover:underline">Se connecter</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import api from '../assets/js/api.js';
+        import { requireGuest } from '../assets/js/auth.js';
+
+        requireGuest();
+
+        const form = document.getElementById('register-form');
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submit-btn');
+        const companyField = document.getElementById('company-field');
+        const roleInputs = document.querySelectorAll('input[name="role"]');
+
+        // Afficher / masquer le champ société selon le rôle
+        roleInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                if (input.value === 'media_manager' && input.checked) {
+                    companyField.classList.remove('hidden');
+                } else if (input.value === 'advertiser' && input.checked) {
+                    companyField.classList.add('hidden');
+                }
+            });
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const password = document.getElementById('password').value;
+            const confirmation = document.getElementById('password_confirmation').value;
+
+            if (password !== confirmation) {
+                showAlert('Les mots de passe ne correspondent pas.', 'error');
+                return;
+            }
+
+            if (password.length < 8) {
+                showAlert('Le mot de passe doit contenir au moins 8 caractères.', 'error');
+                return;
+            }
+
+            const role = document.querySelector('input[name="role"]:checked').value;
+
+            const data = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim() || null,
+                password: password,
+                password_confirmation: confirmation,
+                role: role,
+            };
+
+            // Ajouter le nom de la société si media_manager
+            if (role === 'media_manager') {
+                data.company_name = document.getElementById('company_name').value.trim() || null;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Création...';
+            alertBox.classList.add('hidden');
+
+            try {
+                const response = await api.post('/register', data);
+                const result = response.data;
+
+                // Si le backend renvoie un token, on connecte directement
+                const token = result.token || result.access_token || result.data?.token;
+                const user = result.user || result.data?.user;
+
+                if (token && user) {
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(user));
+
+                    showAlert('Compte créé avec succès ! Redirection...', 'success');
+
+                    setTimeout(() => {
+                        if (user.role === 'media_manager' || user.role === 'mediamanager') {
+                            window.location.href = '/mediamanager/index.html';
+                        } else {
+                            window.location.href = '/client/dashboard.html';
+                        }
+                    }, 1200);
+                } else {
+                    // Pas de token → redirection vers login
+                    showAlert('Compte créé ! Vous pouvez maintenant vous connecter.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/auth/login.html';
+                    }, 1500);
+                }
+
+            } catch (error) {
+                let message = 'Une erreur est survenue lors de l’inscription.';
+
+                if (error.response?.status === 422) {
+                    const errors = error.response.data.errors;
+                    if (errors) {
+                        message = Object.values(errors).flat().join(' ');
+                    } else if (error.response.data.message) {
+                        message = error.response.data.message;
+                    }
+                } else if (error.response?.data?.message) {
+                    message = error.response.data.message;
+                }
+
+                showAlert(message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Créer mon compte';
+            }
+        });
+
+        function showAlert(message, type) {
+            alertBox.classList.remove('hidden');
+            if (type === 'success') {
+                alertBox.className = 'mb-4 rounded-lg border border-emerald-700 bg-emerald-900/40 p-3 text-sm text-emerald-300';
+            } else {
+                alertBox.className = 'mb-4 rounded-lg border border-red-700 bg-red-900/40 p-3 text-sm text-red-300';
+            }
+            alertBox.textContent = message;
+        }
+    </script>
+</body>
+</html> 

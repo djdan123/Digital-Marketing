@@ -10,6 +10,9 @@ export const init = async () => {
     document.getElementById('stat-users')?.replaceChildren(document.createTextNode(stats.users_count ?? stats.usersCount ?? '—'));
     document.getElementById('stat-campaigns')?.replaceChildren(document.createTextNode(stats.campaigns_count ?? stats.campaignsCount ?? '—'));
     document.getElementById('stat-media')?.replaceChildren(document.createTextNode(stats.media_count ?? stats.mediaCount ?? '—'));
+    document.getElementById('stat-commissions-total')?.replaceChildren(document.createTextNode(`${Number(stats.commissions_total ?? 0).toLocaleString('fr-FR')} FBU`));
+    document.getElementById('stat-commissions-month')?.replaceChildren(document.createTextNode(`${Number(stats.commissions_month ?? 0).toLocaleString('fr-FR')} FBU ce mois`));
+    document.getElementById('stat-commissions-today')?.replaceChildren(document.createTextNode(`${Number(stats.commissions_today ?? 0).toLocaleString('fr-FR')} FBU`));
 
     const tbody = document.getElementById('latest-campaigns-body');
     const campaigns = stats.latest_campaigns ?? stats.latestCampaigns ?? [];

@@ -158,16 +158,16 @@
                 if (search) params.search = search;
 
                 const response = await api.get('/admin/campaigns', { params });
-                const campaigns = response.data.data || response.data;
-                const meta = response.data.meta || {};
+                const campaigns = response.data?.data || response.data || [];
+                const meta = response.data?.meta || {};
 
                 const tbody = document.getElementById('campaigns-table-body');
 
-                if (!campaigns || campaigns.length === 0) {
+                if (!Array.isArray(campaigns) || campaigns.length === 0) {
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="6" class="px-6 py-8 text-center text-gray-400">
-                                Aucune campagne trouvée
+                                Aucune campagne trouvée pour cette recherche.
                             </td>
                         </tr>
                     `;
@@ -211,7 +211,7 @@
                 document.getElementById('campaigns-table-body').innerHTML = `
                     <tr>
                         <td colspan="6" class="px-6 py-8 text-center text-red-400">
-                            Erreur lors du chargement des campagnes
+                            ${error.response?.status === 403 ? 'Vous n’êtes pas autorisé à consulter cette ressource.' : 'Impossible de charger les campagnes. Veuillez réessayer.'}
                         </td>
                     </tr>
                 `;

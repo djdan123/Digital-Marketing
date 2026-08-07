@@ -32,8 +32,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
 
     // Groupe Admin (préfixe /admin)
-    Route::prefix('admin')->group(function () {
+    Route::middleware('admin')->prefix('admin')->group(function () {
         require __DIR__ . '/admin.php';
+    });
+
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('wallet/requests', [\App\Http\Controllers\Api\Admin\WalletRequestController::class, 'index']);
+        Route::post('wallet/requests/{report_id}/approve', [\App\Http\Controllers\Api\Admin\WalletRequestController::class, 'approve']);
+        Route::post('wallet/requests/{report_id}/reject', [\App\Http\Controllers\Api\Admin\WalletRequestController::class, 'reject']);
     });
 
     // Groupe Annonceur (préfixe /advertiser)
@@ -50,4 +56,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('shared')->group(function () {
         require __DIR__ . '/shared.php';
     });
+
 });

@@ -5,12 +5,16 @@ namespace App\Services\Payment;
 use App\DTOs\Payment\ProcessPaymentDTO;
 use App\Models\Payment;
 use App\Repositories\Contracts\PaymentRepositoryInterface;
+use App\Services\Contracts\PaymentCommissionServiceInterface;
 use App\Services\Contracts\PaymentServiceInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PaymentService implements PaymentServiceInterface
 {
-    public function __construct(private PaymentRepositoryInterface $paymentRepository)
-    {
+    public function __construct(
+        private PaymentRepositoryInterface $paymentRepository,
+        private PaymentCommissionServiceInterface $paymentCommissionService,
+    ) {
     }
 
     public function process(ProcessPaymentDTO $dto): Payment
@@ -26,15 +30,22 @@ class PaymentService implements PaymentServiceInterface
             'metadata' => $dto->metadata,
         ]);
 
+        $successfulStatuses = ['completed', 'paid', 'succeeded', 'success'];
+        if (in_array($payment->status, $successfulStatuses, true)) {
+            $this->paymentCommissionService->processCommission($payment);
+        } elseif ($payment->status === 'refunded') {
+            $payment->transactions()->where('type', 'commission')->delete();
+        }
+
         return $payment;
     }
 
-    public function findByAdvertiser(int $advertiserId, int $perPage = 15)
+    public function findByAdvertiser(int $advertiserId, int $perPage = 15): LengthAwarePaginator
     {
         return $this->paymentRepository->findByAdvertiser($advertiserId, $perPage);
     }
 
-    public function findPending(int $perPage = 15)
+    public function findPending(int $perPage = 15): LengthAwarePaginator
     {
         return $this->paymentRepository->findPending($perPage);
     }

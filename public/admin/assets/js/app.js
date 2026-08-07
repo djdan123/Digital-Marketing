@@ -60,4 +60,9 @@ export const initApp = async () => {
   hideLoading();
 };
 
-document.addEventListener('DOMContentLoaded', initApp);
+// Ancien point d'entrée — ne s'exécute que sur les pages legacy explicites
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.body.dataset.legacyApp === 'true') {
+    initApp();
+  }
+});

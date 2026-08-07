@@ -1,34 +1,143 @@
 ﻿<!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Creer - schedules â€” TruckAll Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
-<link href="/admin/assets/css/app.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle planification - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 antialiased" data-page="schedule" data-action="create">
-<div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
-  <svg class="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-</div>
-<div id="sidebar-container"></div>
-<div id="navbar-container"></div>
-<div class="lg:pl-64 pt-16 p-4 sm:p-6 lg:p-8 page-content">
-  <div class="max-w-7xl mx-auto">
-    <header class="mb-6">
-      <p class="text-sm text-gray-500 dark:text-gray-400">Administration</p>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Creer - schedules</h1>
-    </header>
-    <form id="schedule-form" class="p-6 bg-white rounded-lg shadow dark:bg-gray-800 max-w-xl space-y-4"><div><label class="block mb-2 text-sm">scheduled at</label><input type="datetime-local" name="scheduled_at" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
-<div><label class="block mb-2 text-sm">media id</label><input type="text" name="media_id" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
-<div><label class="block mb-2 text-sm">advertisement id</label><input type="text" name="advertisement_id" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
-<button type="submit" class="mt-4 px-4 py-2 text-white bg-blue-700 rounded-lg hover:bg-blue-800">Enregistrer</button></form>
-    <div id="footer-container"></div>
-  </div>
-</div>
-<script type="module" src="../assets/js/app.js"></script>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Nouvelle planification</h1>
+            <p class="text-sm text-gray-400">Planifier une diffusion</p>
+        </div>
+
+        <div id="alert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-6 max-w-3xl">
+            <form id="create-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-white">Campagne <span class="text-red-400">*</span></label>
+                        <select id="campaign_id" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                            <option value="">Chargement des campagnes...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-white">Média <span class="text-red-400">*</span></label>
+                        <select id="media_id" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                            <option value="">Chargement des médias...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-white">Date de début <span class="text-red-400">*</span></label>
+                        <input type="datetime-local" id="starts_at" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-white">Date de fin</label>
+                        <input type="datetime-local" id="ends_at" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Notes</label>
+                    <textarea id="notes" rows="3" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t border-gray-700">
+                    <button type="submit" id="submit-btn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg">Créer</button>
+                    <a href="/admin/schedules/index.html" class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+        fetch('/admin/components/sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        });
+
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submit-btn');
+        const campaignSelect = document.getElementById('campaign_id');
+        const mediaSelect = document.getElementById('media_id');
+
+        function showAlert(msg, type = 'error') {
+            alertBox.classList.remove('hidden');
+            alertBox.className = `mb-6 p-4 rounded-lg text-sm ${type === 'success' ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'}`;
+            alertBox.textContent = msg;
+        }
+
+        async function loadOptions() {
+            try {
+                const [campaignsRes, mediaRes] = await Promise.all([
+                    api.get('/admin/campaigns').catch(() => api.get('/api/admin/campaigns')),
+                    api.get('/admin/media').catch(() => api.get('/api/admin/media'))
+                ]);
+
+                const campaigns = campaignsRes.data?.data || [];
+                const media = mediaRes.data?.data || [];
+
+                campaignSelect.innerHTML = '<option value="">Sélectionnez une campagne</option>';
+                mediaSelect.innerHTML = '<option value="">Sélectionnez un média</option>';
+
+                campaigns.forEach((campaign) => {
+                    const option = document.createElement('option');
+                    option.value = campaign.id;
+                    option.textContent = campaign.name || `Campagne #${campaign.id}`;
+                    campaignSelect.appendChild(option);
+                });
+
+                media.forEach((item) => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = item.name || `Média #${item.id}`;
+                    mediaSelect.appendChild(option);
+                });
+            } catch (error) {
+                campaignSelect.innerHTML = '<option value="">Impossible de charger les campagnes</option>';
+                mediaSelect.innerHTML = '<option value="">Impossible de charger les médias</option>';
+            }
+        }
+
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Création...';
+
+            const data = {
+                campaign_id: parseInt(document.getElementById('campaign_id').value),
+                media_id: parseInt(document.getElementById('media_id').value),
+                starts_at: document.getElementById('starts_at').value,
+                ends_at: document.getElementById('ends_at').value || null,
+                notes: document.getElementById('notes').value.trim() || null,
+            };
+
+            try {
+                await api.post('/admin/schedules', data).catch(() => api.post('/schedules', data));
+                showAlert('Planification créée', 'success');
+                setTimeout(() => window.location.href = '/admin/schedules/index.html', 1000);
+            } catch (error) {
+                showAlert(error.response?.data?.message || 'Erreur lors de la création');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Créer';
+            }
+        });
+
+        loadOptions();
+    </script>
 </body>
 </html>

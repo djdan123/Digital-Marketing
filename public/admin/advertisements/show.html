@@ -1,35 +1,89 @@
 ﻿<!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DÃ©tail publicitÃ© â€” TruckAll Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
-<link href="/admin/assets/css/app.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail publicité - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link href="/admin/assets/css/app.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 antialiased" data-page="advertisement" data-action="show">
-<div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
-  <svg class="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-</div>
-<div id="sidebar-container"></div>
-<div id="navbar-container"></div>
-<div class="lg:pl-64 pt-16 p-4 sm:p-6 lg:p-8 page-content">
-  <div class="max-w-7xl mx-auto">
-    <header class="mb-6">
-      <p class="text-sm text-gray-500 dark:text-gray-400">Administration</p>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">DÃ©tail publicitÃ©</h1>
-    </header>
-    <div class="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
-  <dl class="space-y-2 mb-4"><dt class="font-medium">Titre</dt><dd id="ad-title">â€”</dd><dt class="font-medium mt-2">Statut</dt><dd id="ad-status">â€”</dd></dl>
-  <button id="approve-btn" type="button" class="mr-2 px-4 py-2 text-white bg-green-700 rounded-lg">Approuver</button>
-  <button id="reject-btn" type="button" class="px-4 py-2 text-white bg-red-700 rounded-lg">Rejeter</button>
-</div>
-    <div id="footer-container"></div>
-  </div>
-</div>
-<script type="module" src="../assets/js/app.js"></script>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <a href="/admin/advertisements/index.html" class="text-sm text-blue-400 hover:underline">← Retour aux publicités</a>
+            <h1 class="text-2xl font-bold text-white mt-2">Détail publicité</h1>
+        </div>
+
+        <div id="alert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+        <div id="loading" class="text-gray-400 text-sm">Chargement...</div>
+
+        <div id="content" class="hidden bg-gray-800 rounded-lg border border-gray-700 p-6 max-w-3xl">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div><dt class="text-gray-400">Titre</dt><dd id="ad-title" class="text-white font-medium mt-1">—</dd></div>
+                <div><dt class="text-gray-400">Statut</dt><dd id="ad-status" class="mt-1">—</dd></div>
+                <div><dt class="text-gray-400">Campagne</dt><dd id="ad-campaign" class="text-white mt-1">—</dd></div>
+                <div><dt class="text-gray-400">Média</dt><dd id="ad-media" class="text-white mt-1">—</dd></div>
+            </dl>
+            <div class="flex gap-3 mt-6 pt-6 border-t border-gray-700">
+                <button id="approve-btn" type="button" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg">Approuver</button>
+                <button id="reject-btn" type="button" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg">Rejeter</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import api from '../assets/js/api.js';
+        import { initAdminPage, showAlert, statusBadge } from '../assets/js/layout.js';
+
+        initAdminPage();
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (!id) {
+            showAlert('alert', 'Identifiant publicité manquant.');
+        }
+
+        async function load() {
+            try {
+                const { data } = await api.get(`/admin/advertisements/${id}`);
+                const ad = data.data || data;
+                document.getElementById('ad-title').textContent = ad.title || '—';
+                document.getElementById('ad-status').innerHTML = statusBadge(ad.status);
+                document.getElementById('ad-campaign').textContent = ad.campaign?.name || ad.campaign_id || '—';
+                document.getElementById('ad-media').textContent = ad.media?.name || ad.media_id || '—';
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+            } catch {
+                document.getElementById('loading').textContent = 'Erreur de chargement.';
+            }
+        }
+
+        document.getElementById('approve-btn')?.addEventListener('click', async () => {
+            try {
+                await api.post(`/admin/advertisements/${id}/approve`);
+                showAlert('alert', 'Publicité approuvée.', 'success');
+                load();
+            } catch {
+                showAlert('alert', 'Erreur lors de l\'approbation.');
+            }
+        });
+
+        document.getElementById('reject-btn')?.addEventListener('click', async () => {
+            try {
+                await api.post(`/admin/advertisements/${id}/reject`);
+                showAlert('alert', 'Publicité rejetée.', 'success');
+                load();
+            } catch {
+                showAlert('alert', 'Erreur lors du rejet.');
+            }
+        });
+
+        if (id) load();
+    </script>
 </body>
 </html>

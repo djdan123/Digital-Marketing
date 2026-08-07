@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier catégorie - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Modifier la catégorie</h1>
+        </div>
+
+        <div id="alert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-6 max-w-xl">
+            <form id="edit-form" class="space-y-5">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Nom <span class="text-red-400">*</span></label>
+                    <input type="text" id="name" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Slug</label>
+                    <input type="text" id="slug" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Description</label>
+                    <textarea id="description" rows="3" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5"></textarea>
+                </div>
+                <div class="flex gap-3 pt-4 border-t border-gray-700">
+                    <button type="submit" id="submit-btn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg">Enregistrer</button>
+                    <a href="/admin/categories/index.html" class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+        fetch('/admin/components/sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        });
+
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) window.location.href = '/admin/categories/index.html';
+
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submit-btn');
+
+        async function load() {
+            try {
+                const res = await api.get(`/admin/categories/${id}`).catch(() => api.get(`/shared/categories/${id}`));
+                const c = res.data?.data || res.data;
+                document.getElementById('name').value = c.name || '';
+                document.getElementById('slug').value = c.slug || '';
+                document.getElementById('description').value = c.description || '';
+            } catch {
+                alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-red-800 text-red-100';
+                alertBox.textContent = 'Impossible de charger la catégorie';
+                alertBox.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            try {
+                await api.put(`/admin/categories/${id}`, {
+                    name: document.getElementById('name').value.trim(),
+                    slug: document.getElementById('slug').value.trim() || null,
+                    description: document.getElementById('description').value.trim() || null,
+                });
+                alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-green-800 text-green-100';
+                alertBox.textContent = 'Catégorie mise à jour';
+                alertBox.classList.remove('hidden');
+                setTimeout(() => window.location.href = '/admin/categories/index.html', 1000);
+            } catch (error) {
+                alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-red-800 text-red-100';
+                alertBox.textContent = error.response?.data?.message || 'Erreur';
+                alertBox.classList.remove('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+
+        load();
+    </script>
+</body>
+</html>

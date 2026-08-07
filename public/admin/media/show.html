@@ -1,31 +1,70 @@
 ﻿<!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DÃ©tail mÃ©dia â€” TruckAll Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
-<link href="/admin/assets/css/app.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail média - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link href="/admin/assets/css/app.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 antialiased" data-page="media" data-action="show">
-<div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
-  <svg class="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-</div>
-<div id="sidebar-container"></div>
-<div id="navbar-container"></div>
-<div class="lg:pl-64 pt-16 p-4 sm:p-6 lg:p-8 page-content">
-  <div class="max-w-7xl mx-auto">
-    <header class="mb-6">
-      <p class="text-sm text-gray-500 dark:text-gray-400">Administration</p>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">DÃ©tail mÃ©dia</h1>
-    </header>
-    <div class="p-6 bg-white rounded-lg shadow dark:bg-gray-800"><dl class="space-y-2"><dt class="font-medium">Nom</dt><dd id="media-name">â€”</dd><dt class="font-medium mt-2">Type</dt><dd id="media-type">â€”</dd></dl></div>
-    <div id="footer-container"></div>
-  </div>
-</div>
-<script type="module" src="../assets/js/app.js"></script>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <a href="/admin/media/index.html" class="text-sm text-blue-400 hover:underline">← Retour aux médias</a>
+            <h1 class="text-2xl font-bold text-white mt-2">Détail média</h1>
+        </div>
+
+        <div id="loading" class="text-gray-400 text-sm">Chargement...</div>
+
+        <div id="content" class="hidden bg-gray-800 rounded-lg border border-gray-700 p-6 max-w-3xl">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div><dt class="text-gray-400">Nom</dt><dd id="media-name" class="text-white font-medium mt-1">—</dd></div>
+                <div><dt class="text-gray-400">Type</dt><dd id="media-type" class="text-white mt-1">—</dd></div>
+                <div><dt class="text-gray-400">Statut</dt><dd id="media-status" class="mt-1">—</dd></div>
+                <div><dt class="text-gray-400">Prix de base</dt><dd id="media-price" class="text-white mt-1">—</dd></div>
+                <div class="md:col-span-2"><dt class="text-gray-400">Description</dt><dd id="media-description" class="text-white mt-1">—</dd></div>
+            </dl>
+            <div class="mt-6 pt-6 border-t border-gray-700">
+                <a id="edit-link" href="#" class="text-blue-400 hover:underline text-sm">Modifier ce média</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import api from '../assets/js/api.js';
+        import { initAdminPage, statusBadge } from '../assets/js/layout.js';
+
+        initAdminPage();
+
+        const id = new URLSearchParams(window.location.search).get('id');
+
+        async function load() {
+            if (!id) {
+                document.getElementById('loading').textContent = 'Identifiant manquant.';
+                return;
+            }
+            try {
+                const { data } = await api.get(`/admin/media/${id}`);
+                const m = data.data || data;
+                document.getElementById('media-name').textContent = m.name || '—';
+                document.getElementById('media-type').textContent = m.type || '—';
+                document.getElementById('media-status').innerHTML = statusBadge(m.status);
+                document.getElementById('media-price').textContent = m.base_price != null ? `${m.base_price} $` : '—';
+                document.getElementById('media-description').textContent = m.description || '—';
+                document.getElementById('edit-link').href = `/admin/media/edit.html?id=${id}`;
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+            } catch {
+                document.getElementById('loading').textContent = 'Erreur de chargement.';
+            }
+        }
+
+        load();
+    </script>
 </body>
 </html>

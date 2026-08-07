@@ -1,33 +1,110 @@
 ﻿<!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Modifier - users â€” TruckAll Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
-<link href="/admin/assets/css/app.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier utilisateur - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 antialiased" data-page="user" data-action="edit">
-<div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
-  <svg class="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-</div>
-<div id="sidebar-container"></div>
-<div id="navbar-container"></div>
-<div class="lg:pl-64 pt-16 p-4 sm:p-6 lg:p-8 page-content">
-  <div class="max-w-7xl mx-auto">
-    <header class="mb-6">
-      <p class="text-sm text-gray-500 dark:text-gray-400">Administration</p>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Modifier - users</h1>
-    </header>
-    <form id="user-form" class="p-6 bg-white rounded-lg shadow dark:bg-gray-800 max-w-xl space-y-4"><div><label class="block mb-2 text-sm">name</label><input type="text" name="name" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
-<div><label class="block mb-2 text-sm">email</label><input type="email" name="email" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></div>
-<button type="submit" class="mt-4 px-4 py-2 text-white bg-blue-700 rounded-lg hover:bg-blue-800">Enregistrer</button></form>
-    <div id="footer-container"></div>
-  </div>
-</div>
-<script type="module" src="../assets/js/app.js"></script>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Modifier l’utilisateur</h1>
+        </div>
+
+        <div id="alert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-6 max-w-xl">
+            <form id="edit-form" class="space-y-6">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Nom <span class="text-red-400">*</span></label>
+                    <input type="text" id="name" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Email <span class="text-red-400">*</span></label>
+                    <input type="email" id="email" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Rôle</label>
+                    <select id="role" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                        <option value="admin">Administrateur</option>
+                        <option value="advertiser">Annonceur</option>
+                        <option value="media_manager">Responsable média</option>
+                        <option value="accountant">Comptable</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t border-gray-700">
+                    <button type="submit" id="submit-btn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg">Enregistrer</button>
+                    <a href="/admin/users/index.html" class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+        fetch('/admin/components/sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        });
+
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) window.location.href = '/admin/users/index.html';
+
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submit-btn');
+
+        function showAlert(msg, type = 'error') {
+            alertBox.classList.remove('hidden');
+            alertBox.className = `mb-6 p-4 rounded-lg text-sm ${type === 'success' ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'}`;
+            alertBox.textContent = msg;
+        }
+
+        async function load() {
+            try {
+                const res = await api.get(`/admin/users/${id}`);
+                const u = res.data.data || res.data;
+                document.getElementById('name').value = u.name || '';
+                document.getElementById('email').value = u.email || '';
+                document.getElementById('role').value = u.role || 'advertiser';
+            } catch (e) {
+                showAlert('Impossible de charger l’utilisateur');
+            }
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enregistrement...';
+
+            const data = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                role: document.getElementById('role').value,
+            };
+
+            try {
+                await api.put(`/admin/users/${id}`, data);
+                showAlert('Utilisateur mis à jour', 'success');
+                setTimeout(() => window.location.href = '/admin/users/index.html', 1000);
+            } catch (error) {
+                showAlert(error.response?.data?.message || 'Erreur');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enregistrer';
+            }
+        });
+
+        load();
+    </script>
 </body>
 </html>

@@ -1,31 +1,81 @@
 ﻿<!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DÃ©tail campagne â€” TruckAll Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
-<link href="/admin/assets/css/app.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail campagne - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 antialiased" data-page="campaign" data-action="show">
-<div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
-  <svg class="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-</div>
-<div id="sidebar-container"></div>
-<div id="navbar-container"></div>
-<div class="lg:pl-64 pt-16 p-4 sm:p-6 lg:p-8 page-content">
-  <div class="max-w-7xl mx-auto">
-    <header class="mb-6">
-      <p class="text-sm text-gray-500 dark:text-gray-400">Administration</p>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">DÃ©tail campagne</h1>
-    </header>
-    <div class="p-6 bg-white rounded-lg shadow dark:bg-gray-800"><dl class="space-y-2"><dt class="font-medium">Nom</dt><dd id="campaign-name">â€”</dd><dt class="font-medium mt-2">Statut</dt><dd id="campaign-status">â€”</dd><dt class="font-medium mt-2">Budget</dt><dd id="campaign-budget">â€”</dd></dl></div>
-    <div id="footer-container"></div>
-  </div>
-</div>
-<script type="module" src="../assets/js/app.js"></script>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-white" id="campaign-name">Campagne</h1>
+                <p class="text-sm text-gray-400">Détails de la campagne</p>
+            </div>
+            <a id="edit-link" href="#" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg">Modifier</a>
+        </div>
+
+        <div id="content" class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+            <p class="text-gray-400">Chargement...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+        fetch('/admin/components/sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        });
+
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) window.location.href = '/admin/campaigns/index.html';
+
+        document.getElementById('edit-link').href = `/admin/campaigns/edit.html?id=${id}`;
+
+        async function load() {
+            try {
+                const res = await api.get(`/admin/campaigns/${id}`);
+                const c = res.data.data || res.data;
+
+                document.getElementById('campaign-name').textContent = c.name || 'Campagne';
+
+                document.getElementById('content').innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm text-gray-400">Statut</p>
+                            <p class="text-white font-medium mt-1">${c.status || '—'}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Budget</p>
+                            <p class="text-white font-medium mt-1">${c.budget ? c.budget + ' $' : '—'}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Date de début</p>
+                            <p class="text-white font-medium mt-1">${c.starts_at ? new Date(c.starts_at).toLocaleDateString('fr-FR') : '—'}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Date de fin</p>
+                            <p class="text-white font-medium mt-1">${c.ends_at ? new Date(c.ends_at).toLocaleDateString('fr-FR') : '—'}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-sm text-gray-400">Objectif</p>
+                            <p class="text-white mt-1">${c.objective || '—'}</p>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                document.getElementById('content').innerHTML = `<p class="text-red-400">Impossible de charger la campagne</p>`;
+            }
+        }
+        load();
+    </script>
 </body>
 </html>

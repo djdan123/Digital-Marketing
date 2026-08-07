@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistiques - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="sidebar-container"></div>
+    <main class="p-4 sm:ml-64 min-h-screen">
+        <div class="mb-8">
+            <h1 class="text-2xl font-semibold text-white">Statistiques</h1>
+            <p class="mt-1 text-sm text-slate-400">Consultez les performances de vos campagnes et publicités.</p>
+        </div>
+
+        <div id="stats-loader" class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/20">
+            <p class="text-sm text-slate-500">Chargement des données…</p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth, logout } from '../../assets/js/auth.js';
+        import api from '../../assets/js/api.js';
+        requireAuth();
+
+        fetch('/layouts/sidebar-client.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+            document.getElementById('logout-btn')?.addEventListener('click', logout);
+        });
+
+        async function loadStatistics() {
+            try {
+                const res = await api.get('/statistics');
+                const items = res.data.data || res.data || [];
+                const container = document.getElementById('stats-loader');
+
+                if (!items.length) {
+                    container.innerHTML = '<p class="text-sm text-slate-500">Aucune statistique disponible.</p>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="grid gap-4 md:grid-cols-2">
+                        ${items.slice(0, 6).map(item => `
+                            <div class="rounded-xl border border-slate-800 bg-slate-800/50 p-4">
+                                <p class="text-xs uppercase tracking-wide text-slate-400">${item.date || 'Stat'}</p>
+                                <p class="mt-2 text-lg font-semibold text-white">${item.value ?? item.metric ?? '—'}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('stats-loader').innerHTML = '<p class="text-sm text-red-400">Impossible de charger les statistiques.</p>';
+            }
+        }
+
+        loadStatistics();
+    </script>
+</body>
+</html>

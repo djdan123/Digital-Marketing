@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Manager - Détail demande</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: { 500: '#2563eb', 600: '#1d4ed8' } } } } };
+    </script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="sidebar-container"></div>
+
+    <main class="min-h-screen p-4 sm:ml-64">
+        <div id="detail-content" class="space-y-6"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { initMediaManagerPage, getStatusBadgeClass, getStatusLabel, createEmptyState, formatDate } from '../assets/js/media-manager.js';
+        import api from '../assets/js/api.js';
+        import { uploadFileSafe } from '../assets/js/upload.js';
+
+        await initMediaManagerPage();
+
+        const params = new URLSearchParams(window.location.search);
+        const requestId = params.get('id');
+
+        if (!requestId) {
+            document.getElementById('detail-content').innerHTML = createEmptyState('Aucune demande sélectionnée.');
+        } else {
+            await loadRequestDetail(requestId);
+        }
+
+        async function loadRequestDetail(id) {
+            try {
+                const response = await api.get(`/media-manager/requests/${id}`);
+                const request = response.data?.data || response.data || {};
+                renderDetail(request);
+            } catch (error) {
+                document.getElementById('detail-content').innerHTML = createEmptyState('Endpoint non disponible pour ce détail.');
+            }
+        }
+
+        function renderDetail(request) {
+            const detailContent = document.getElementById('detail-content');
+            detailContent.innerHTML = `
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/90 p-6">
+                    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div>
+                            <h1 class="text-2xl font-semibold text-white">${request.campaign?.name || 'Campagne'}</h1>
+                            <p class="mt-1 text-sm text-slate-400">${request.advertiser?.name || 'Annonceur'} · ${request.media?.name || 'Média'}</p>
+                        </div>
+                        <span class="rounded-full border px-3 py-1 text-sm ${getStatusBadgeClass(request.status)}">${getStatusLabel(request.status)}</span>
+                    </div>
+
+                    <div class="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                        <div class="space-y-4">
+                            <div class="rounded-xl border border-slate-800 bg-slate-800/60 p-4">
+                                <h2 class="text-sm font-semibold text-white">Informations campagne</h2>
+                                <div class="mt-3 space-y-2 text-sm text-slate-400">
+                                    <p><span class="text-slate-500">Titre :</span> ${request.campaign?.name || '—'}</p>
+                                    <p><span class="text-slate-500">Format :</span> ${request.advertisement?.format || request.content_type || '—'}</p>
+                                    <p><span class="text-slate-500">Dates souhaitées :</span> ${request.start_date ? `${request.start_date} → ${request.end_date || '—'}` : '—'}</p>
+                                    <p><span class="text-slate-500">Fichier / texte :</span> ${request.advertisement?.file_path || request.message || '—'}</p>
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-slate-800 bg-slate-800/60 p-4">
+                                <h2 class="text-sm font-semibold text-white">Message initial</h2>
+                                <p class="mt-2 text-sm text-slate-400">${request.initial_message || 'Aucun message initial.'}</p>
+                            </div>
+
+                            <div class="rounded-xl border border-slate-800 bg-slate-800/60 p-4">
+                                <h2 class="text-sm font-semibold text-white">Fil de messages</h2>
+                                <div id="messages-list" class="mt-3 space-y-2"></div>
+                                <form id="message-form" class="mt-4 space-y-3">
+                                    <textarea id="message-input" rows="3" class="w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm text-white" placeholder="Répondre au client..."></textarea>
+                                    <div class="flex gap-2">
+                                        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">Envoyer</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="rounded-xl border border-slate-800 bg-slate-800/60 p-4">
+                                <h2 class="text-sm font-semibold text-white">Décisions</h2>
+                                <div class="mt-3 space-y-3">
+                                    ${request.status === 'pending' || request.status === 'in_discussion' ? `
+                                        <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
+                                            <h3 class="text-sm font-semibold text-white">Accepter</h3>
+                                            <div class="mt-2 space-y-2">
+                                                <input id="approve-start" type="datetime-local" class="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" />
+                                                <input id="approve-end" type="datetime-local" class="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" />
+                                                <button id="approve-btn" class="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white">Approuver</button>
+                                            </div>
+                                        </div>
+                                        <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
+                                            <h3 class="text-sm font-semibold text-white">Refuser</h3>
+                                            <textarea id="reject-reason" rows="3" class="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" placeholder="Motif obligatoire..."></textarea>
+                                            <button id="reject-btn" class="mt-2 w-full rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white">Refuser</button>
+                                        </div>
+                                        <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3">
+                                            <h3 class="text-sm font-semibold text-white">Demander une modification</h3>
+                                            <textarea id="revision-message" rows="3" class="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" placeholder="Préciser la modification demandée..."></textarea>
+                                            <button id="revision-btn" class="mt-2 w-full rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white">Demander modification</button>
+                                        </div>
+                                    ` : `<div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 text-sm text-slate-400">Aucune action critique disponible pour ce statut.</div>`}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            renderMessages(request.messages || []);
+            bindActions(request.id);
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-list');
+            if (!messages.length) {
+                container.innerHTML = createEmptyState('Aucune conversation pour le moment.');
+                return;
+            }
+            container.innerHTML = messages.map(message => `
+                <div class="rounded-lg border border-slate-800 bg-slate-900/70 p-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-sm font-medium text-white">${message.sender || 'Utilisateur'}</p>
+                        <p class="text-xs text-slate-500">${formatDate(message.created_at)}</p>
+                    </div>
+                    <p class="mt-2 text-sm text-slate-400">${message.body || message.content || '—'}</p>
+                </div>
+            `).join('');
+        }
+
+        function bindActions(requestId) {
+            document.getElementById('message-form')?.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const message = document.getElementById('message-input').value;
+                if (!message.trim()) return;
+                try {
+                    await api.post(`/media-manager/requests/${requestId}/messages`, { message });
+                    document.getElementById('message-input').value = '';
+                    await loadRequestDetail(requestId);
+                } catch (error) {
+                    alert('Impossible d’envoyer ce message.');
+                }
+            });
+
+            document.getElementById('approve-btn')?.addEventListener('click', async () => {
+                const start = document.getElementById('approve-start').value;
+                const end = document.getElementById('approve-end').value;
+                if (!start || !end) {
+                    alert('Veuillez renseigner le créneau complet.');
+                    return;
+                }
+                try {
+                    await api.put(`/media-manager/requests/${requestId}/approve`, { start_at: start, end_at: end });
+                    await loadRequestDetail(requestId);
+                } catch (error) {
+                    alert('Impossible d’approuver la demande.');
+                }
+            });
+
+            document.getElementById('reject-btn')?.addEventListener('click', async () => {
+                const reason = document.getElementById('reject-reason').value;
+                if (!reason.trim()) {
+                    alert('Le motif est obligatoire.');
+                    return;
+                }
+                if (!confirm('Confirmer le refus de cette demande ?')) {
+                    return;
+                }
+                try {
+                    await api.put(`/media-manager/requests/${requestId}/reject`, { reason });
+                    await loadRequestDetail(requestId);
+                } catch (error) {
+                    alert('Impossible de refuser la demande.');
+                }
+            });
+
+            document.getElementById('revision-btn')?.addEventListener('click', async () => {
+                const message = document.getElementById('revision-message').value;
+                if (!message.trim()) {
+                    alert('Veuillez préciser la modification demandée.');
+                    return;
+                }
+                try {
+                    await api.post(`/media-manager/requests/${requestId}/messages`, { message, action: 'revision' });
+                    await loadRequestDetail(requestId);
+                } catch (error) {
+                    alert('Impossible de demander une modification.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

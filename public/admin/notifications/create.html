@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle notification - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>tailwind.config = { darkMode: 'class' }</script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Envoyer une notification</h1>
+        </div>
+
+        <div id="alert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-6 max-w-2xl">
+            <form id="create-form" class="space-y-5">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Titre <span class="text-red-400">*</span></label>
+                    <input type="text" id="title" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-white">Message <span class="text-red-400">*</span></label>
+                    <textarea id="message" rows="4" required class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-white">Canal</label>
+                        <select id="channel" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                            <option value="email">Email</option>
+                            <option value="sms">SMS</option>
+                            <option value="database">Notification interne</option>
+                            <option value="push">Push</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-white">Destinataires</label>
+                        <select id="audience" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full p-2.5">
+                            <option value="all">Tous</option>
+                            <option value="admin">Admins</option>
+                            <option value="advertiser">Annonceurs</option>
+                            <option value="media_manager">Media Managers</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-4 border-t border-gray-700">
+                    <button type="submit" id="submit-btn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg">Envoyer</button>
+                    <a href="/admin/notifications/index.html" class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+        fetch('/admin/components/sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+        });
+
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submit-btn');
+
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Envoi...';
+
+            const data = {
+                title: document.getElementById('title').value.trim(),
+                message: document.getElementById('message').value.trim(),
+                channel: document.getElementById('channel').value,
+                audience: document.getElementById('audience').value,
+            };
+
+            try {
+                await api.post('/admin/notifications', data);
+                alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-green-800 text-green-100';
+                alertBox.textContent = 'Notification envoyée';
+                alertBox.classList.remove('hidden');
+                setTimeout(() => window.location.href = '/admin/notifications/index.html', 1000);
+            } catch (error) {
+                alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-red-800 text-red-100';
+                alertBox.textContent = error.response?.data?.message || 'Endpoint notifications non disponible ou erreur';
+                alertBox.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Envoyer';
+            }
+        });
+    </script>
+</body>
+</html>

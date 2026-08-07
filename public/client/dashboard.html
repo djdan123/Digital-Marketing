@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tableau de bord - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { primary: { 500: '#2563eb', 600: '#1d4ed8' } } } }
+        };
+    </script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="sidebar-container"></div>
+
+    <main class="p-4 sm:ml-64 min-h-screen">
+        <div class="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-white">Tableau de bord</h1>
+                <p class="mt-1 text-sm text-slate-400">Vue d’ensemble de votre espace client TruckAll</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="/client/campaigns/create.html" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700">
+                    + Nouvelle campagne
+                </a>
+                <a href="/client/messages.html" class="inline-flex items-center rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-blue-500 hover:text-white">
+                    Voir le workflow
+                </a>
+            </div>
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg shadow-black/20">
+                <p class="text-sm text-slate-400">Solde portefeuille</p>
+                <p id="balance" class="mt-3 text-3xl font-semibold text-white">—</p>
+            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg shadow-black/20">
+                <p class="text-sm text-slate-400">Campagnes actives</p>
+                <p id="campaigns-count" class="mt-3 text-3xl font-semibold text-white">—</p>
+            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg shadow-black/20">
+                <p class="text-sm text-slate-400">Publicités en cours</p>
+                <p id="ads-count" class="mt-3 text-3xl font-semibold text-white">—</p>
+            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg shadow-black/20">
+                <p class="text-sm text-slate-400">Demandes de recharge</p>
+                <p id="requests-count" class="mt-3 text-3xl font-semibold text-white">—</p>
+            </div>
+        </div>
+
+        <div class="mt-8 grid gap-6 xl:grid-cols-[2fr_1fr]">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/20">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-white">Campagnes récentes</h2>
+                    <a href="/client/campaigns/index.html" class="text-sm text-blue-400 hover:underline">Voir tout</a>
+                </div>
+                <div id="campaigns-list" class="space-y-3">
+                    <p class="text-sm text-slate-500">Chargement…</p>
+                </div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/20">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-white">Activité rapide</h2>
+                </div>
+                <div id="activity-list" class="space-y-3">
+                    <p class="text-sm text-slate-500">Chargement…</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth, logout } from '../assets/js/auth.js';
+        import api from '../assets/js/api.js';
+
+        requireAuth();
+
+        fetch('/layouts/sidebar-client.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('sidebar-container').innerHTML = html;
+                document.getElementById('logout-btn')?.addEventListener('click', logout);
+            });
+
+        async function loadDashboard() {
+            try {
+                const [walletRes, campaignsRes, adsRes, requestsRes] = await Promise.all([
+                    api.get('/advertiser/wallet').catch(() => ({ data: { data: { balance: 0 } } })),
+                    api.get('/advertiser/campaigns').catch(() => api.get('/campaigns').catch(() => ({ data: { data: [] } }))),
+                    api.get('/advertiser/advertisements').catch(() => api.get('/advertisements').catch(() => ({ data: { data: [] } }))),
+                    api.get('/advertiser/wallet/requests').catch(() => api.get('/advertiser/recharge-requests').catch(() => ({ data: { data: [] } })))
+                ]);
+
+                const wallet = walletRes.data.data || walletRes.data || {};
+                const campaigns = campaignsRes.data.data || campaignsRes.data || [];
+                const ads = adsRes.data.data || adsRes.data || [];
+                const requests = requestsRes.data.data || requestsRes.data || [];
+
+                document.getElementById('balance').textContent = new Intl.NumberFormat('fr-FR').format(wallet.balance || 0) + ' FBU';
+                document.getElementById('campaigns-count').textContent = Array.isArray(campaigns) ? campaigns.length : 0;
+                document.getElementById('ads-count').textContent = Array.isArray(ads) ? ads.length : 0;
+                document.getElementById('requests-count').textContent = Array.isArray(requests) ? requests.length : 0;
+
+                const campaignsList = document.getElementById('campaigns-list');
+                if (!Array.isArray(campaigns) || !campaigns.length) {
+                    campaignsList.innerHTML = '<p class="text-sm text-slate-500">Aucune campagne pour le moment.</p>';
+                } else {
+                    campaignsList.innerHTML = campaigns.slice(0, 4).map(c => `
+                        <div class="rounded-lg border border-slate-800 bg-slate-800/60 p-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                    <p class="text-sm font-medium text-white">${c.name || 'Campagne'}</p>
+                                    <p class="text-xs text-slate-400">${c.status || 'pending'}</p>
+                                </div>
+                                <span class="rounded-full bg-blue-600/20 px-2.5 py-1 text-xs text-blue-300">${new Intl.NumberFormat('fr-FR').format(c.budget || 0)} FBU</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                const activityList = document.getElementById('activity-list');
+                const activity = [
+                    { label: 'Campagnes', value: `${Array.isArray(campaigns) ? campaigns.length : 0} créées` },
+                    { label: 'Publicités', value: `${Array.isArray(ads) ? ads.length : 0} enregistrées` },
+                    { label: 'Recharges', value: `${Array.isArray(requests) ? requests.length : 0} demandes` }
+                ];
+                activityList.innerHTML = activity.map(item => `
+                    <div class="rounded-lg border border-slate-800 bg-slate-800/40 p-3">
+                        <p class="text-sm font-medium text-white">${item.label}</p>
+                        <p class="text-xs text-slate-400">${item.value}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('campaigns-list').innerHTML = '<p class="text-sm text-red-400">Chargement impossible.</p>';
+                document.getElementById('activity-list').innerHTML = '<p class="text-sm text-red-400">Chargement impossible.</p>';
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

@@ -22,7 +22,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'role',//role pour creer un admin
+        'role',
+        'media_id',
         'password',
     ];
 

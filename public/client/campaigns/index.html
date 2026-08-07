@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes campagnes - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64 min-h-screen">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Mes campagnes</h1>
+                <p class="text-sm text-slate-400">Gérez vos campagnes publicitaires</p>
+            </div>
+            <a href="/client/campaigns/create.html"
+               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700">
+                + Nouvelle campagne
+            </a>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-700/50 rounded-xl overflow-hidden">
+            <table class="w-full text-sm text-left text-slate-300">
+                <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                    <tr>
+                        <th class="px-6 py-3">Nom</th>
+                        <th class="px-6 py-3">Budget</th>
+                        <th class="px-6 py-3">Statut</th>
+                        <th class="px-6 py-3">Période</th>
+                        <th class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth, logout } from '../../assets/js/auth.js';
+        import api from '../../assets/js/api.js';
+
+        requireAuth();
+        fetch('/layouts/sidebar-client.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+            document.getElementById('logout-btn')?.addEventListener('click', logout);
+        });
+
+        function badge(status) {
+            const map = {
+                draft: 'bg-slate-600', pending: 'bg-yellow-600', approved: 'bg-blue-600',
+                active: 'bg-green-600', completed: 'bg-purple-600', cancelled: 'bg-red-600'
+            };
+            return `<span class="px-2 py-0.5 rounded-full text-xs text-white ${map[status] || 'bg-slate-600'}">${status || '—'}</span>`;
+        }
+
+        async function load() {
+            try {
+                const res = await api.get('/advertiser/campaigns');
+                const payload = res.data?.data || res.data || {};
+                const items = Array.isArray(payload.data)
+                    ? payload.data
+                    : Array.isArray(payload)
+                        ? payload
+                        : [];
+                const tbody = document.getElementById('table-body');
+
+                if (!items.length) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Aucune campagne. <a href="/client/campaigns/create.html" class="text-blue-400">Créer la première</a></td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = items.map(c => `
+                    <tr class="border-b border-slate-800 hover:bg-slate-800/40">
+                        <td class="px-6 py-4 font-medium text-white">${c.name || '—'}</td>
+                        <td class="px-6 py-4">${c.budget ? new Intl.NumberFormat('fr-FR').format(c.budget) + ' FBU' : '—'}</td>
+                        <td class="px-6 py-4">${badge(c.status)}</td>
+                        <td class="px-6 py-4 text-sm">
+                            ${c.starts_at ? new Date(c.starts_at).toLocaleDateString('fr-FR') : '—'}
+                            →
+                            ${c.ends_at ? new Date(c.ends_at).toLocaleDateString('fr-FR') : '—'}
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <a href="/client/campaigns/details.html?id=${c.id}" class="text-blue-400 hover:text-blue-300">Voir</a>
+                            <a href="/client/campaigns/edit.html?id=${c.id}" class="text-slate-400 hover:text-white">Modifier</a>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                document.getElementById('table-body').innerHTML =
+                    `<tr><td colspan="5" class="px-6 py-8 text-center text-red-400">${e.response?.data?.message || 'Erreur de chargement'}</td></tr>`;
+            }
+        }
+        load();
+    </script>
+</body>
+</html>

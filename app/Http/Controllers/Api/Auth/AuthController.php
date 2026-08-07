@@ -18,10 +18,13 @@ class AuthController extends Controller
 			'device_name' => ['sometimes', 'string'], // optionnel
 		]);
 
-		if (! Auth::attempt($request->only('email', 'password'))) {
-			throw ValidationException::withMessages([
-				'email' => ['Les identifiants fournis sont incorrects.'],
-			]);
+		$credentials = $request->only('email', 'password');
+		$credentials['email'] = trim(strtolower($credentials['email']));
+
+		if (! Auth::attempt($credentials)) {
+			return response()->json([
+				'message' => 'Les identifiants fournis sont incorrects.',
+			], 401);
 		}
 
 		$user = Auth::user();

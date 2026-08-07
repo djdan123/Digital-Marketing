@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle campagne - TruckAll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div id="sidebar-container"></div>
+
+    <div class="p-4 sm:ml-64 min-h-screen">
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-white">Nouvelle campagne</h1>
+            <p class="text-sm text-slate-400">Créez votre campagne en 4 étapes</p>
+        </div>
+
+        <!-- Stepper -->
+        <div class="mb-10">
+            <ol class="flex items-center w-full">
+                <li id="step-indicator-1" class="flex items-center text-blue-400 after:content-[''] after:w-full after:h-0.5 after:border-b after:border-blue-400 after:mx-2 after:inline-block">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-bold shrink-0">1</span>
+                    <span class="hidden sm:inline ml-2 text-sm font-medium">Média</span>
+                </li>
+                <li id="step-indicator-2" class="flex items-center text-slate-500 after:content-[''] after:w-full after:h-0.5 after:border-b after:border-slate-700 after:mx-2 after:inline-block">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-slate-400 text-sm font-bold shrink-0">2</span>
+                    <span class="hidden sm:inline ml-2 text-sm font-medium">Contenu</span>
+                </li>
+                <li id="step-indicator-3" class="flex items-center text-slate-500 after:content-[''] after:w-full after:h-0.5 after:border-b after:border-slate-700 after:mx-2 after:inline-block">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-slate-400 text-sm font-bold shrink-0">3</span>
+                    <span class="hidden sm:inline ml-2 text-sm font-medium">Planning</span>
+                </li>
+                <li id="step-indicator-4" class="flex items-center text-slate-500">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-slate-400 text-sm font-bold shrink-0">4</span>
+                    <span class="hidden sm:inline ml-2 text-sm font-medium">Paiement</span>
+                </li>
+            </ol>
+        </div>
+
+        <div id="alert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+
+        <!-- ========== ÉTAPE 1 : MÉDIA ========== -->
+        <div id="step-1" class="bg-slate-900 border border-slate-700/50 rounded-xl p-6 max-w-3xl">
+            <h2 class="text-lg font-semibold text-white mb-2">1. Choisir un média</h2>
+            <p class="text-sm text-slate-400 mb-6">Sélectionnez le média sur lequel diffuser votre publicité</p>
+
+            <div class="mb-4">
+                <input type="text" id="media-search" placeholder="Rechercher un média..."
+                       class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5 mb-4">
+            </div>
+
+            <div id="media-list" class="space-y-3 max-h-80 overflow-y-auto mb-6">
+                <p class="text-slate-500 text-sm">Chargement...</p>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" onclick="goToStep(2)" id="btn-step1"
+                        class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg disabled:opacity-40" disabled>
+                    Suivant →
+                </button>
+            </div>
+        </div>
+
+        <!-- ========== ÉTAPE 2 : CONTENU ========== -->
+        <div id="step-2" class="hidden bg-slate-900 border border-slate-700/50 rounded-xl p-6 max-w-3xl">
+            <h2 class="text-lg font-semibold text-white mb-2">2. Contenu de la publicité</h2>
+            <p class="text-sm text-slate-400 mb-6">Informations de la campagne et type de contenu</p>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-slate-300">Nom de la campagne <span class="text-red-400">*</span></label>
+                    <input type="text" id="campaign-name" required
+                           class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5"
+                           placeholder="Ex: Promo Été 2026">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-slate-300">Objectif</label>
+                    <textarea id="campaign-objective" rows="2"
+                              class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5"
+                              placeholder="Objectif de la campagne..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-slate-300">Type de contenu <span class="text-red-400">*</span></label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <label class="content-type cursor-pointer">
+                            <input type="radio" name="content_type" value="image" class="hidden peer">
+                            <div class="p-4 rounded-lg border border-slate-600 peer-checked:border-blue-500 peer-checked:bg-blue-600/20 text-center hover:border-slate-500 transition">
+                                <p class="text-sm font-medium text-white">Image</p>
+                                <p class="text-xs text-slate-400 mt-1">500 FBU</p>
+                            </div>
+                        </label>
+                        <label class="content-type cursor-pointer">
+                            <input type="radio" name="content_type" value="text" class="hidden peer">
+                            <div class="p-4 rounded-lg border border-slate-600 peer-checked:border-blue-500 peer-checked:bg-blue-600/20 text-center hover:border-slate-500 transition">
+                                <p class="text-sm font-medium text-white">Texte</p>
+                                <p class="text-xs text-slate-400 mt-1">2 000 FBU</p>
+                            </div>
+                        </label>
+                        <label class="content-type cursor-pointer">
+                            <input type="radio" name="content_type" value="audio" class="hidden peer">
+                            <div class="p-4 rounded-lg border border-slate-600 peer-checked:border-blue-500 peer-checked:bg-blue-600/20 text-center hover:border-slate-500 transition">
+                                <p class="text-sm font-medium text-white">Audio</p>
+                                <p class="text-xs text-slate-400 mt-1">10 000 FBU/min</p>
+                            </div>
+                        </label>
+                        <label class="content-type cursor-pointer">
+                            <input type="radio" name="content_type" value="video" class="hidden peer">
+                            <div class="p-4 rounded-lg border border-slate-600 peer-checked:border-blue-500 peer-checked:bg-blue-600/20 text-center hover:border-slate-500 transition">
+                                <p class="text-sm font-medium text-white">Vidéo</p>
+                                <p class="text-xs text-slate-400 mt-1">50 000 FBU/min</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+               <!-- Remplace #file-upload-zone par : -->
+<div id="file-upload-zone">
+    <label class="block mb-2 text-sm font-medium text-slate-300">
+        Fichier <span class="text-red-400">*</span>
+    </label>
+
+    <div id="drop-zone"
+         class="border-2 border-dashed border-slate-600 hover:border-blue-500 rounded-xl p-8 text-center cursor-pointer transition bg-slate-800/30">
+        <input type="file" id="content-file" class="hidden"
+               accept="image/*,audio/*,video/*">
+        <svg class="w-10 h-10 mx-auto text-slate-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+        </svg>
+        <p class="text-sm text-slate-300" id="drop-label">Glissez un fichier ici ou cliquez pour parcourir</p>
+        <p class="text-xs text-slate-500 mt-1" id="drop-hint">Image · Audio · Vidéo</p>
+    </div>
+
+    <!-- Aperçu / info fichier -->
+    <div id="file-preview" class="hidden mt-4 p-4 rounded-lg bg-slate-800 border border-slate-700 flex items-center gap-4">
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-white truncate" id="file-name">—</p>
+            <p class="text-xs text-slate-400" id="file-size">—</p>
+        </div>
+        <button type="button" id="file-remove" class="text-red-400 hover:text-red-300 text-sm">Retirer</button>
+    </div>
+
+    <!-- Barre de progression -->
+    <div id="upload-progress" class="hidden mt-4">
+        <div class="flex justify-between text-xs text-slate-400 mb-1">
+            <span>Upload en cours...</span>
+            <span id="upload-percent">0%</span>
+        </div>
+        <div class="w-full bg-slate-700 rounded-full h-2">
+            <div id="upload-bar" class="bg-blue-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+
+                <div id="text-content-zone" class="hidden">
+                    <label class="block mb-2 text-sm font-medium text-slate-300">Texte de l'annonce</label>
+                    <textarea id="text-content" rows="4"
+                              class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5"
+                              placeholder="Rédigez le texte de votre annonce..."></textarea>
+                </div>
+
+                <div id="duration-zone" class="hidden">
+                    <label class="block mb-2 text-sm font-medium text-slate-300">Durée (minutes)</label>
+                    <input type="number" id="duration" min="1" value="1"
+                           class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5 max-w-xs">
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button type="button" onclick="goToStep(1)" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg">← Retour</button>
+                <button type="button" onclick="goToStep(3)" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg">Suivant →</button>
+            </div>
+        </div>
+
+        <!-- ========== ÉTAPE 3 : PLANNING ========== -->
+        <div id="step-3" class="hidden bg-slate-900 border border-slate-700/50 rounded-xl p-6 max-w-3xl">
+            <h2 class="text-lg font-semibold text-white mb-2">3. Planning de diffusion</h2>
+            <p class="text-sm text-slate-400 mb-6">Définissez la période et le nombre de diffusions</p>
+
+            <div class="space-y-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-slate-300">Date de début <span class="text-red-400">*</span></label>
+                        <input type="date" id="starts_at" required
+                               class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-slate-300">Date de fin</label>
+                        <input type="date" id="ends_at"
+                               class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-slate-300">Nombre de diffusions <span class="text-red-400">*</span></label>
+                    <input type="number" id="broadcasts_count" required min="1" value="1"
+                           class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5 max-w-xs">
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button type="button" onclick="goToStep(2)" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg">← Retour</button>
+                <button type="button" onclick="goToStep(4)" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg">Suivant →</button>
+            </div>
+        </div>
+
+        <!-- ========== ÉTAPE 4 : PAIEMENT / RÉCAP ========== -->
+        <div id="step-4" class="hidden bg-slate-900 border border-slate-700/50 rounded-xl p-6 max-w-3xl">
+            <h2 class="text-lg font-semibold text-white mb-2">4. Récapitulatif & paiement</h2>
+            <p class="text-sm text-slate-400 mb-6">Vérifiez les informations et confirmez</p>
+
+            <div class="bg-slate-800/50 rounded-lg p-5 space-y-3 mb-6">
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Campagne</span>
+                    <span class="text-white font-medium" id="recap-name">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Média</span>
+                    <span class="text-white font-medium" id="recap-media">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Type de contenu</span>
+                    <span class="text-white font-medium" id="recap-type">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Diffusions</span>
+                    <span class="text-white font-medium" id="recap-broadcasts">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Période</span>
+                    <span class="text-white font-medium" id="recap-period">—</span>
+                </div>
+                <div class="border-t border-slate-700 pt-3 flex justify-between">
+                    <span class="text-slate-300 font-medium">Coût estimé</span>
+                    <span class="text-blue-400 font-bold text-lg" id="recap-cost">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Solde portefeuille</span>
+                    <span class="text-white font-medium" id="recap-balance">—</span>
+                </div>
+            </div>
+
+            <div id="insufficient-funds" class="hidden mb-4 p-3 rounded-lg bg-yellow-900/40 border border-yellow-700 text-yellow-200 text-sm">
+                Solde insuffisant. 
+                <a href="/client/wallet.html" class="underline font-medium">Demander une recharge</a>
+            </div>
+
+            <div class="flex justify-between">
+                <button type="button" onclick="goToStep(3)" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg">← Retour</button>
+                <button type="button" id="submit-campaign" onclick="submitCampaign()"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+                    <span class="submit-label">Confirmer et lancer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        import { requireAuth, logout } from '../../assets/js/auth.js';
+        import api from '../../assets/js/api.js';
+        import { validateFile, uploadFileSafe, UPLOAD_CONFIG } from '../../assets/js/upload.js';
+
+        requireAuth();
+        fetch('/layouts/sidebar-client.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar-container').innerHTML = html;
+            document.getElementById('logout-btn')?.addEventListener('click', logout);
+        });
+
+        // État de la campagne
+        const state = {
+            media_id: null,
+            media_name: '',
+            media_price: 0,
+            name: '',
+            objective: '',
+            content_type: null,
+            duration: 1,
+            broadcasts_count: 1,
+            starts_at: '',
+            ends_at: '',
+            text_content: '',
+            file: null,
+            wallet_balance: 0
+        };
+
+        const PRICES = { image: 500, text: 2000, audio: 10000, video: 50000 };
+
+        // ---- Stepper ----
+        window.goToStep = function(step) {
+            if (step === 2 && !state.media_id) {
+                showAlert('Veuillez sélectionner un média');
+                return;
+            }
+            if (step === 3) {
+                state.name = document.getElementById('campaign-name').value.trim();
+                state.objective = document.getElementById('campaign-objective').value.trim();
+                state.content_type = document.querySelector('input[name="content_type"]:checked')?.value;
+                state.duration = parseInt(document.getElementById('duration').value) || 1;
+                state.text_content = document.getElementById('text-content').value.trim();
+                state.file = document.getElementById('content-file').files[0] || null;
+
+                if (!state.name || !state.content_type) {
+                    showAlert('Nom et type de contenu obligatoires');
+                    return;
+                }
+            }
+            if (step === 4) {
+                state.starts_at = document.getElementById('starts_at').value;
+                state.ends_at = document.getElementById('ends_at').value;
+                state.broadcasts_count = parseInt(document.getElementById('broadcasts_count').value) || 1;
+
+                if (!state.starts_at || state.broadcasts_count < 1) {
+                    showAlert('Date de début et nombre de diffusions obligatoires');
+                    return;
+                }
+                updateRecap();
+            }
+
+            // Afficher l'étape
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step-${i}`).classList.toggle('hidden', i !== step);
+                const ind = document.getElementById(`step-indicator-${i}`);
+                if (i <= step) {
+                    ind.classList.remove('text-slate-500');
+                    ind.classList.add('text-blue-400');
+                    ind.querySelector('span').classList.remove('bg-slate-700', 'text-slate-400');
+                    ind.querySelector('span').classList.add('bg-blue-600', 'text-white');
+                } else {
+                    ind.classList.add('text-slate-500');
+                    ind.classList.remove('text-blue-400');
+                    ind.querySelector('span').classList.add('bg-slate-700', 'text-slate-400');
+                    ind.querySelector('span').classList.remove('bg-blue-600', 'text-white');
+                }
+            }
+            document.getElementById('alert').classList.add('hidden');
+        };
+
+        function showAlert(msg) {
+            const el = document.getElementById('alert');
+            el.classList.remove('hidden');
+            el.className = 'mb-6 p-4 rounded-lg text-sm bg-red-900/50 text-red-300 border border-red-700';
+            el.textContent = msg;
+        }
+
+        // ---- Charger médias ----
+        async function loadMedia() {
+            try {
+                const res = await api.get('/shared/media');
+                const items = res.data?.data || res.data || [];
+                const list = document.getElementById('media-list');
+
+                if (!items.length) {
+                    list.innerHTML = `<p class="text-slate-500 text-sm">Aucun média disponible.</p>`;
+                    return;
+                }
+
+                list.innerHTML = items.map(m => `
+                    <label class="flex items-center gap-4 p-4 rounded-lg border border-slate-700 hover:border-blue-500/50 cursor-pointer transition media-option"
+                           data-id="${m.id}" data-name="${m.name || ''}" data-price="${m.base_price || 0}">
+                        <input type="radio" name="media" value="${m.id}" class="text-blue-600 focus:ring-blue-500">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-white">${m.name || 'Média'}</p>
+                            <p class="text-xs text-slate-400">${m.type || ''} ${m.base_price ? '· ' + m.base_price + ' FBU' : ''}</p>
+                        </div>
+                    </label>
+                `).join('');
+
+                list.querySelectorAll('.media-option').forEach(el => {
+                    el.addEventListener('click', () => {
+                        state.media_id = parseInt(el.dataset.id);
+                        state.media_name = el.dataset.name;
+                        state.media_price = parseFloat(el.dataset.price) || 0;
+                        document.getElementById('btn-step1').disabled = false;
+                    });
+                });
+            } catch (e) {
+                const message = e.response?.data?.message || 'Erreur de chargement des médias';
+                document.getElementById('media-list').innerHTML =
+                    `<p class="text-red-400 text-sm">${message}</p>`;
+            }
+        }
+
+        // Recherche média
+        document.getElementById('media-search')?.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('.media-option').forEach(el => {
+                el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+
+        // Type de contenu → afficher zones
+        document.querySelectorAll('input[name="content_type"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const type = radio.value;
+                document.getElementById('file-upload-zone').classList.toggle('hidden', type === 'text');
+                document.getElementById('text-content-zone').classList.toggle('hidden', type !== 'text');
+                document.getElementById('duration-zone').classList.toggle('hidden', type !== 'audio' && type !== 'video');
+            });
+        });
+
+        // ---- Récap & coût ----
+        function computeCost() {
+            const unit = PRICES[state.content_type] || 0;
+            if (state.content_type === 'audio' || state.content_type === 'video') {
+                return unit * state.duration * state.broadcasts_count;
+            }
+            return unit * state.broadcasts_count;
+        }
+
+        function updateRecap() {
+            document.getElementById('recap-name').textContent = state.name;
+            document.getElementById('recap-media').textContent = state.media_name;
+            document.getElementById('recap-type').textContent = state.content_type;
+            document.getElementById('recap-broadcasts').textContent = state.broadcasts_count;
+            document.getElementById('recap-period').textContent =
+                `${state.starts_at || '—'} → ${state.ends_at || '—'}`;
+
+            const cost = computeCost();
+            document.getElementById('recap-cost').textContent =
+                new Intl.NumberFormat('fr-FR').format(cost) + ' FBU';
+            document.getElementById('recap-balance').textContent =
+                new Intl.NumberFormat('fr-FR').format(state.wallet_balance) + ' FBU';
+
+            const insufficient = state.wallet_balance < cost;
+            document.getElementById('insufficient-funds').classList.toggle('hidden', !insufficient);
+            document.getElementById('submit-campaign').disabled = insufficient;
+        }
+
+        async function loadBalance() {
+            try {
+                const res = await api.get('/advertiser/wallet');
+                const w = res.data.data || res.data || {};
+                state.wallet_balance = parseFloat(w.balance) || 0;
+            } catch {
+                state.wallet_balance = 0;
+            }
+        }
+
+        // ---- Soumission ----
+        window.submitCampaign = async function() {
+            const btn = document.getElementById('submit-campaign');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="inline-flex items-center gap-2"><svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"></path></svg><span>Création…</span></span>';
+
+            try {
+                // 1. Créer la campagne
+                const campaignData = {
+                    name: state.name,
+                    objective: state.objective || null,
+                    media_id: state.media_id,
+                    status: 'pending',
+                    starts_at: state.starts_at,
+                    ends_at: state.ends_at || null,
+                    budget: computeCost()
+                };
+
+                const campRes = await api.post('/advertiser/campaigns', campaignData);
+
+                const campaign = campRes.data.data || campRes.data;
+
+                // 2. Créer la publicité / upload si besoin
+                // (adapter selon ton API)
+                if (state.content_type === 'text') {
+                    await api.post('/advertiser/advertisements', {
+                        campaign_id: campaign.id,
+                        media_id: state.media_id,
+                        title: state.name,
+                        description: state.text_content,
+                        format: 'text',
+                        status: 'pending'
+                    }).catch(() => {});
+                }
+                // Pour fichier : utiliser FormData si endpoint upload existe
+
+                alert('Campagne créée avec succès !');
+                window.location.href = '/client/campaigns/index.html';
+            } catch (error) {
+                const msg = error.response?.data?.message
+                    || Object.values(error.response?.data?.errors || {}).flat().join(' ')
+                    || 'Erreur lors de la création';
+                showAlert(msg);
+                btn.disabled = false;
+                btn.textContent = 'Confirmer et lancer';
+            }
+        };
+        // ---- Gestion du drop zone ----
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('content-file');
+const filePreview = document.getElementById('file-preview');
+
+dropZone?.addEventListener('click', () => fileInput.click());
+
+dropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-blue-500', 'bg-blue-600/10');
+});
+
+dropZone?.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-blue-500', 'bg-blue-600/10');
+});
+
+dropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-blue-500', 'bg-blue-600/10');
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelect();
+    }
+});
+
+fileInput?.addEventListener('change', handleFileSelect);
+
+document.getElementById('file-remove')?.addEventListener('click', () => {
+    fileInput.value = '';
+    state.file = null;
+    state.uploaded = null;
+    filePreview.classList.add('hidden');
+});
+
+function handleFileSelect() {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const contentType = document.querySelector('input[name="content_type"]:checked')?.value;
+    if (!contentType || contentType === 'text') {
+        showAlert('Choisissez d\'abord un type de contenu (image, audio ou vidéo)');
+        fileInput.value = '';
+        return;
+    }
+
+    const validation = validateFile(file, contentType);
+    if (!validation.ok) {
+        showAlert(validation.error);
+        fileInput.value = '';
+        return;
+    }
+
+    state.file = file;
+    state.uploaded = null;
+
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-size').textContent = formatSize(file.size);
+    filePreview.classList.remove('hidden');
+}
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' o';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' Mo';
+}
+
+// Mettre à jour les hints selon le type
+document.querySelectorAll('input[name="content_type"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        const type = radio.value;
+        const config = UPLOAD_CONFIG[type];
+        if (config) {
+            fileInput.accept = config.accept;
+            document.getElementById('drop-hint').textContent = config.label;
+        }
+        // Reset fichier si on change de type
+        fileInput.value = '';
+        state.file = null;
+        filePreview.classList.add('hidden');
+    });
+});
+
+// ---- Soumission avec upload ----
+window.submitCampaign = async function() {
+    const btn = document.getElementById('submit-campaign');
+    btn.disabled = true;
+    btn.textContent = 'Création...';
+
+    try {
+        let fileData = null;
+
+        // Upload du fichier si nécessaire
+        if (state.content_type !== 'text' && state.file) {
+            document.getElementById('upload-progress').classList.remove('hidden');
+
+            fileData = await uploadFileSafe(state.file, state.content_type, (percent) => {
+                document.getElementById('upload-percent').textContent = percent + '%';
+                document.getElementById('upload-bar').style.width = percent + '%';
+            });
+
+            document.getElementById('upload-progress').classList.add('hidden');
+        }
+
+        // Créer la campagne
+        const campaignData = {
+            name: state.name,
+            objective: state.objective || null,
+            media_id: state.media_id,
+            status: 'pending',
+            starts_at: state.starts_at,
+            ends_at: state.ends_at || null,
+            budget: computeCost()
+        };
+
+        const campRes = await api.post('/advertiser/campaigns', campaignData);
+        const campaign = campRes.data.data || campRes.data;
+
+        // Créer la publicité liée
+        const adData = {
+            campaign_id: campaign.id,
+            media_id: state.media_id,
+            title: state.name,
+            description: state.content_type === 'text' ? state.text_content : (state.objective || null),
+            format: state.content_type,
+            status: 'pending',
+            meta: fileData ? {
+                file_path: fileData.path || null,
+                file_url: fileData.url || null,
+                filename: fileData.filename || null,
+                mime: fileData.mime || null,
+                type: fileData.type || null,
+                size: fileData.size || null,
+            } : null,
+            duration: (state.content_type === 'audio' || state.content_type === 'video')
+                ? state.duration
+                : null
+        };
+
+        await api.post('/advertiser/advertisements', adData);
+
+        alert('Campagne créée avec succès !');
+        window.location.href = '/client/campaigns/index.html';
+
+    } catch (error) {
+        document.getElementById('upload-progress')?.classList.add('hidden');
+        const msg = error.response?.data?.message
+            || error.message
+            || Object.values(error.response?.data?.errors || {}).flat().join(' ')
+            || 'Erreur lors de la création';
+        showAlert(msg);
+        btn.disabled = false;
+        btn.innerHTML = '<span class="submit-label">Confirmer et lancer</span>';
+    }
+};
+
+        // Init
+        loadMedia();
+        loadBalance();
+    </script>
+</body>
+</html>

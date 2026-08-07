@@ -17,7 +17,7 @@ class StoreCampaignRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'advertiser_id' => ['required', 'integer', 'exists:advertisers,id'],
+            'advertiser_id' => ['sometimes', 'integer', 'exists:advertisers,id'],
             'name' => ['required', 'string', 'max:255'],
             'objective' => ['nullable', 'string', 'max:1000'],
             'status' => ['sometimes', 'string', Rule::in(array_map(fn($value) => $value->value, CampaignStatus::cases()))],
